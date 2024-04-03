@@ -1,6 +1,5 @@
 package com.ndc.cinfo.core.di.module
 
-import com.ndc.cinfo.BuildConfig
 import com.ndc.cinfo.utils.SharedPreferencesManager
 import dagger.Module
 import dagger.Provides
@@ -8,8 +7,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 @Module
