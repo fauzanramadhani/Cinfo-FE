@@ -20,9 +20,9 @@ fun PasswordTextField(
     modifier: Modifier = Modifier,
     placeholder: String = "",
     enabled: Boolean = true,
-    error: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    textFieldState: TextFieldState = TextFieldState.Empty,
     leadingIcon: @Composable (() -> Unit)? = null,
     visible: Boolean = true,
     onVisibilityChange: (visible: Boolean) -> Unit = {},
@@ -31,8 +31,9 @@ fun PasswordTextField(
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+    val error = textFieldState is TextFieldState.Error
 
-    BaseTextField(
+    BaseOutlinedTextField(
         modifier = modifier,
         placeholder = {
             Text(
@@ -62,5 +63,9 @@ fun PasswordTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        supportingText = when (textFieldState) {
+            TextFieldState.Empty -> null
+            is TextFieldState.Error -> textFieldState.errorMessage
+        }
     )
 }

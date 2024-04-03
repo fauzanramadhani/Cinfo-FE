@@ -16,7 +16,7 @@ fun PrimaryTextField(
     modifier: Modifier = Modifier,
     placeholder: String = "",
     enabled: Boolean = true,
-    error: Boolean = false,
+    textFieldState: TextFieldState = TextFieldState.Empty,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -26,8 +26,9 @@ fun PrimaryTextField(
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+    val error = textFieldState is TextFieldState.Error
 
-    BaseTextField(
+    BaseOutlinedTextField(
         modifier = modifier,
         placeholder = {
             Text(
@@ -67,6 +68,10 @@ fun PrimaryTextField(
             }
         } else null,
         keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions
+        keyboardActions = keyboardActions,
+        supportingText = when (textFieldState) {
+            TextFieldState.Empty -> null
+            is TextFieldState.Error -> textFieldState.errorMessage
+        }
     )
 }

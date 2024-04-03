@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseTextField(
+fun BaseOutlinedTextField(
     modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit)? = null,
     shape: Shape = RoundedCornerShape(8.dp),
@@ -38,6 +39,7 @@ fun BaseTextField(
     onValueChange: (String) -> Unit = {},
     enabled: Boolean = true,
     isError: Boolean = false,
+    supportingText: String? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -45,8 +47,11 @@ fun BaseTextField(
     singleLine: Boolean = true,
     maxLines: Int = 1,
     readOnly: Boolean = false,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
+    val color = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
     OutlinedTextField(
         modifier = modifier,
         placeholder = placeholder,
@@ -65,5 +70,14 @@ fun BaseTextField(
         singleLine = singleLine,
         maxLines = maxLines,
         readOnly = readOnly,
+        supportingText = if (supportingText != null) {
+            {
+                Text(
+                    text = supportingText,
+                    style = typography.bodySmall,
+                    color = color.error
+                )
+            }
+        } else null
     )
 }

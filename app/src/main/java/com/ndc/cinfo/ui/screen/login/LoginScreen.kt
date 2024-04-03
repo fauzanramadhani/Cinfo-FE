@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,8 @@ import com.ndc.cinfo.ui.component.button.OutlinedIconButton
 import com.ndc.cinfo.ui.component.button.PrimaryButton
 import com.ndc.cinfo.ui.component.textfield.PasswordTextField
 import com.ndc.cinfo.ui.component.textfield.PrimaryTextField
+import com.ndc.cinfo.ui.component.textfield.TextFieldState
+import com.ndc.cinfo.utils.isEmailInvalid
 
 @Composable
 fun LoginScreen(
@@ -49,14 +52,14 @@ fun LoginScreen(
     var emailValue by rememberSaveable {
         mutableStateOf("")
     }
-    var emailError by rememberSaveable {
-        mutableStateOf(false)
+    val emailState = remember {
+        mutableStateOf<TextFieldState>(TextFieldState.Empty)
     }
     var passwordValue by rememberSaveable {
         mutableStateOf("")
     }
-    var passwordError by rememberSaveable {
-        mutableStateOf(false)
+    val passwordState = remember {
+        mutableStateOf<TextFieldState>(TextFieldState.Empty)
     }
     var passwordVisibility by rememberSaveable {
         mutableStateOf(false)
@@ -118,18 +121,32 @@ fun LoginScreen(
                 PrimaryTextField(
                     modifier = Modifier
                         .fillMaxWidth(),
+                    textFieldState = emailState.value,
                     placeholder = "Masukan email kamu",
                     value = emailValue,
                     onValueChange = {
+                        when {
+                            (it.isEmailInvalid() && it.isNotEmpty()) -> {
+                                emailState.value = TextFieldState.Error("Email tidak valid")
+                            }
+
+                            it.length > 32 -> {
+                                emailState.value =
+                                    TextFieldState.Error("Email maksimal 32 karakter")
+                            }
+
+                            else -> {
+                                emailState.value = TextFieldState.Empty
+                            }
+                        }
                         emailValue = it
                     },
                     onClearValue = {
                         emailValue = ""
                     },
-                    error = emailError,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next
-                    )
+                    ),
                 )
             }
             Column(
@@ -146,16 +163,31 @@ fun LoginScreen(
                 PasswordTextField(
                     modifier = Modifier
                         .fillMaxWidth(),
+                    textFieldState = passwordState.value,
                     placeholder = "Masukan password kamu",
                     value = passwordValue,
                     onValueChange = {
+                        when {
+                            it.isNotEmpty() && it.length < 8 -> {
+                                passwordState.value =
+                                    TextFieldState.Error("Password minimal 8 karakter")
+                            }
+
+                            it.length > 32 -> {
+                                passwordState.value =
+                                    TextFieldState.Error("Password maksimal 32 karakter")
+                            }
+
+                            else -> {
+                                passwordState.value = TextFieldState.Empty
+                            }
+                        }
                         passwordValue = it
                     },
                     visible = passwordVisibility,
                     onVisibilityChange = {
                         passwordVisibility = it
                     },
-                    error = passwordError,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done
                     ),
@@ -163,7 +195,7 @@ fun LoginScreen(
                         onDone = {
                             focusManager.clearFocus(true)
                         }
-                    )
+                    ),
                 )
             }
             Text(
@@ -186,7 +218,9 @@ fun LoginScreen(
                 )
                 PrimaryButton(
                     text = "Masuk",
-                    enabled = loginButtonEnabled,
+                    enabled = loginButtonEnabled && emailState.value !is TextFieldState.Error
+                            && passwordState.value !is TextFieldState.Error && emailValue.isNotEmpty()
+                            && passwordValue.isNotEmpty(),
                     modifier = Modifier
                         .weight(1f)
                 )

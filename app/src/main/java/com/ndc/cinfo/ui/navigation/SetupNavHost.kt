@@ -13,16 +13,16 @@ fun SetupNavHost(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = NavRoute.LOGIN.route,
-        route = NavRoute.ROOT.route
+        startDestination = NavRoute.Login.route,
+        route = NavRoute.Root.route
     ) {
         composable(
-            route = NavRoute.LOGIN.route
+            route = NavRoute.Login.route
         ) {
             LoginScreen(navHostController = navHostController)
         }
         composable(
-            route = NavRoute.REGISTER.route
+            route = NavRoute.Register.route
         ) {
             RegisterScreen(navHostController = navHostController)
         }
