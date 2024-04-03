@@ -39,6 +39,7 @@ import com.ndc.cinfo.ui.component.button.PrimaryButton
 import com.ndc.cinfo.ui.component.textfield.PasswordTextField
 import com.ndc.cinfo.ui.component.textfield.PrimaryTextField
 import com.ndc.cinfo.ui.component.textfield.TextFieldState
+import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.utils.isEmailInvalid
 
 @Composable
@@ -73,10 +74,10 @@ fun LoginScreen(
 
     Box(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .background(color.background)
             .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
     ) {
         Image(
             painter = painterResource(id = R.drawable.login_background),
@@ -215,7 +216,11 @@ fun LoginScreen(
                     text = "Daftar",
                     modifier = Modifier
                         .weight(1f)
-                )
+                ) {
+                    navHostController.navigate(NavRoute.Register.route) {
+                        launchSingleTop = true
+                    }
+                }
                 PrimaryButton(
                     text = "Masuk",
                     enabled = loginButtonEnabled && emailState.value !is TextFieldState.Error
