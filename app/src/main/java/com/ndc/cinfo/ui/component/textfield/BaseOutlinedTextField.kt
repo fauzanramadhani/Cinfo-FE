@@ -11,7 +11,6 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
@@ -26,8 +25,8 @@ fun BaseOutlinedTextField(
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        containerColor = Color.White,
-        errorContainerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
+        errorContainerColor = MaterialTheme.colorScheme.background,
         focusedBorderColor = MaterialTheme.colorScheme.primary,
         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
         errorBorderColor = MaterialTheme.colorScheme.error,

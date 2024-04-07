@@ -1,19 +1,16 @@
-package com.ndc.cinfo.ui.screen.main
+package com.ndc.cinfo.ui.screen.main.content
 
-import android.app.Activity
 import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.firebase.Firebase
@@ -22,24 +19,19 @@ import com.ndc.cinfo.ui.component.button.PrimaryButton
 import com.ndc.cinfo.ui.navigation.NavRoute
 
 @Composable
-fun MainScreen(
-    navHostController: NavHostController
+fun AccountScreen(
+    paddingValues: PaddingValues,
+    navHostController: NavHostController,
 ) {
     val firebaseAuth = Firebase.auth
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding(),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val ctx = LocalContext.current
 
-        BackHandler {
-            (ctx as Activity).finish()
-        }
-
-        Text(text = "Main Screen")
+        Text(text = "Account Screen")
         Spacer(modifier = Modifier.padding(bottom = 12.dp))
         PrimaryButton(
             text = "Keluar"
