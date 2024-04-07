@@ -9,7 +9,9 @@ import androidx.navigation.compose.rememberNavController
 import com.ndc.cinfo.ui.navigation.SetupNavHost
 import com.ndc.cinfo.ui.theme.CinfoTheme
 import com.ndc.cinfo.utils.SocketHandler
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
