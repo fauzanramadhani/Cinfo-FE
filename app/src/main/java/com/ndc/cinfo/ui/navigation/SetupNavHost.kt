@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.ndc.cinfo.ui.screen.login.LoginScreen
-import com.ndc.cinfo.ui.screen.main.MainScreen
+import com.ndc.cinfo.ui.screen.main.HomeScreen
 import com.ndc.cinfo.ui.screen.register.RegisterScreen
 
 @Composable
@@ -37,7 +37,7 @@ fun SetupNavHost(
         composable(
             route = NavRoute.Main.route
         ) {
-            MainScreen(navHostController = navHostController)
+            HomeScreen(navHostController = navHostController)
         }
     }
 }

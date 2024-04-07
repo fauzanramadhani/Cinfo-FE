@@ -3,6 +3,7 @@ package com.ndc.cinfo.ui.screen.register
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -124,12 +125,14 @@ fun RegisterScreen(
             .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.register_background),
-            contentDescription = "",
-            modifier = Modifier
-                .height(203.dp)
-        )
+        if (!isSystemInDarkTheme()) {
+            Image(
+                painter = painterResource(id = R.drawable.register_background),
+                contentDescription = "",
+                modifier = Modifier
+                    .height(203.dp)
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -304,7 +307,8 @@ fun RegisterScreen(
         ) {
             PrimaryButton(
                 text = "Daftar",
-                enabled = registerButtonEnabled,
+                enabled = registerButtonEnabled && emailValue.isNotEmpty() && passwordValue.isNotEmpty()
+                        && passwordConfirmationValue.isNotEmpty() && passwordValue == passwordConfirmationValue,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)

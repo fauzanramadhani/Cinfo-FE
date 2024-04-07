@@ -34,12 +34,12 @@ fun DialogLoading(
                 CircularProgressIndicator(
                     strokeCap = StrokeCap.Round,
                     strokeWidth = 8.dp,
-                    color = color.onPrimary,
+                    color = color.onBackground,
                 )
                 Text(
                     text = "Silahkan tunggu...",
                     style = typography.titleMedium,
-                    color = color.onPrimary
+                    color = color.onBackground
                 )
             }
         }
