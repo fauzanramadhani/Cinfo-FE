@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -160,12 +161,14 @@ fun LoginScreen(
             .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.login_background),
-            contentDescription = "",
-            modifier = Modifier
-                .height(203.dp)
-        )
+        if (!isSystemInDarkTheme()) {
+            Image(
+                painter = painterResource(id = R.drawable.login_background),
+                contentDescription = "",
+                modifier = Modifier
+                    .height(203.dp)
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
