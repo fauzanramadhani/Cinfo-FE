@@ -4,6 +4,7 @@ plugins {
     id ("kotlin-kapt")
     id ("dagger.hilt.android.plugin")
     id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -85,13 +86,15 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     // Dependency Injection
     implementation("com.google.dagger:hilt-android:2.48")
-    annotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
     implementation("androidx.hilt:hilt-work:1.1.0")
-    annotationProcessor("androidx.hilt:hilt-compiler:1.1.0")
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("androidx.hilt:hilt-compiler:1.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // Logging Interceptor
     implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
-    //----- GSON
-    implementation ("com.google.code.gson:gson:2.8.9")
+    // Firebase Auth
+    implementation( platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation ("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 }

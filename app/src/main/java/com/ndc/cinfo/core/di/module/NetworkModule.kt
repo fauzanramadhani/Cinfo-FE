@@ -1,9 +1,15 @@
 package com.ndc.cinfo.core.di.module
 
+import android.content.Context
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.ndc.cinfo.BuildConfig
 import com.ndc.cinfo.utils.SharedPreferencesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -34,7 +40,8 @@ object NetworkModule {
             .readTimeout(1, TimeUnit.MINUTES)
             .build()
     }
-//    @Provides
+
+    //    @Provides
 //    fun provideApiService(client: OkHttpClient): ApiService {
 //        val retrofit = Retrofit.Builder()
 //            .baseUrl(BuildConfig.BASE_URL)
@@ -43,4 +50,14 @@ object NetworkModule {
 //            .build()
 //        return retrofit.create(ApiService::class.java)
 //    }
+    @Provides
+    fun provideSignInGoogleClient(
+        @ApplicationContext context: Context,
+    ): GoogleSignInClient {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(BuildConfig.DEFAULT_WEB_CLIENT_ID)
+            .requestEmail()
+            .build()
+        return GoogleSignIn.getClient(context, gso)
+    }
 }

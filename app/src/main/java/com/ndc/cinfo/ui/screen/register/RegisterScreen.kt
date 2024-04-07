@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,23 +30,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ndc.cinfo.R
 import com.ndc.cinfo.ui.component.button.PrimaryButton
+import com.ndc.cinfo.ui.component.dialog.DialogLoading
 import com.ndc.cinfo.ui.component.textfield.PasswordTextField
 import com.ndc.cinfo.ui.component.textfield.PrimaryTextField
 import com.ndc.cinfo.ui.component.textfield.TextFieldState
+import com.ndc.cinfo.ui.navigation.NavRoute
+import com.ndc.cinfo.utils.Toast
+import com.ndc.cinfo.utils.UiState
 import com.ndc.cinfo.utils.isEmailInvalid
 
 @Composable
 fun RegisterScreen(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    registerViewModel: RegisterViewModel = hiltViewModel()
 ) {
+    val ctx = LocalContext.current
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val focusManager = LocalFocusManager.current
@@ -76,6 +86,35 @@ fun RegisterScreen(
     }
     var registerButtonEnabled by rememberSaveable {
         mutableStateOf(true)
+    }
+    var loadingState by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    DialogLoading(visible = loadingState)
+
+    val registerState = registerViewModel.registerState.collectAsStateWithLifecycle().value
+    LaunchedEffect(registerState) {
+        when (registerState) {
+            UiState.Empty -> {}
+            is UiState.Error -> {
+                loadingState = false
+                registerButtonEnabled = true
+                Toast(ctx, registerState.message).long()
+            }
+
+            UiState.Loading -> {
+                loadingState = true
+                registerButtonEnabled = false
+            }
+
+            is UiState.Success -> {
+                loadingState = false
+                navHostController.navigate(NavRoute.Main.route) {
+                    launchSingleTop = true
+                }
+            }
+        }
     }
 
     Box(
@@ -264,12 +303,14 @@ fun RegisterScreen(
             contentAlignment = Alignment.Center,
         ) {
             PrimaryButton(
-                text = "Dafar",
+                text = "Daftar",
                 enabled = registerButtonEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
-            )
+            ) {
+                registerViewModel.register(emailValue, passwordValue)
+            }
         }
     }
 }

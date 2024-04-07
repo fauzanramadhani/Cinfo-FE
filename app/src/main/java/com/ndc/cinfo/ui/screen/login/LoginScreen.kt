@@ -1,5 +1,9 @@
 package com.ndc.cinfo.ui.screen.login
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +23,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,29 +31,44 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ndc.cinfo.R
 import com.ndc.cinfo.ui.component.button.OutlinedButton
 import com.ndc.cinfo.ui.component.button.OutlinedIconButton
 import com.ndc.cinfo.ui.component.button.PrimaryButton
+import com.ndc.cinfo.ui.component.dialog.DialogLoading
 import com.ndc.cinfo.ui.component.textfield.PasswordTextField
 import com.ndc.cinfo.ui.component.textfield.PrimaryTextField
 import com.ndc.cinfo.ui.component.textfield.TextFieldState
 import com.ndc.cinfo.ui.navigation.NavRoute
+import com.ndc.cinfo.utils.Toast
+import com.ndc.cinfo.utils.UiState
 import com.ndc.cinfo.utils.isEmailInvalid
 
 @Composable
 fun LoginScreen(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val ctx = LocalContext.current
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val focusManager = LocalFocusManager.current
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(), onResult = { result ->
+            result.data?.let {
+                loginViewModel.handleLoginWithGoogle(it)
+            }
+        }
+    )
 
     var emailValue by rememberSaveable {
         mutableStateOf("")
@@ -70,6 +90,67 @@ fun LoginScreen(
     }
     var loginGoogleButtonEnabled by rememberSaveable {
         mutableStateOf(true)
+    }
+    var loadingState by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    DialogLoading(visible = loadingState)
+
+    BackHandler {
+        (ctx as Activity).finish()
+    }
+
+    val loginState = loginViewModel.loginState.collectAsStateWithLifecycle().value
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            UiState.Empty -> {}
+            is UiState.Error -> {
+                Toast(ctx, loginState.message).long()
+                loadingState = false
+                loginButtonEnabled = true
+                loginGoogleButtonEnabled = true
+            }
+
+            UiState.Loading -> {
+                loadingState = true
+                loginButtonEnabled = false
+                loginGoogleButtonEnabled = false
+            }
+
+            is UiState.Success -> {
+                loadingState = false
+                navHostController.navigate(NavRoute.Main.route) {
+                    launchSingleTop = true
+                }
+            }
+        }
+    }
+
+    val loginWithGoogleState = loginViewModel.loginWithGoogleState.collectAsStateWithLifecycle().value
+    LaunchedEffect(loginWithGoogleState) {
+        when (loginWithGoogleState) {
+            UiState.Empty -> {}
+            is UiState.Error -> {
+                Toast(ctx, loginWithGoogleState.message).long()
+                loadingState = false
+                loginButtonEnabled = true
+                loginGoogleButtonEnabled = true
+            }
+
+            UiState.Loading -> {
+                loadingState = true
+                loginButtonEnabled = false
+                loginGoogleButtonEnabled = false
+            }
+
+            is UiState.Success -> {
+                loadingState = false
+                navHostController.navigate(NavRoute.Main.route) {
+                    launchSingleTop = true
+                }
+            }
+        }
     }
 
     Box(
@@ -228,7 +309,9 @@ fun LoginScreen(
                             && passwordValue.isNotEmpty(),
                     modifier = Modifier
                         .weight(1f)
-                )
+                ) {
+                    loginViewModel.loginBasic(emailValue, passwordValue)
+                }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -265,7 +348,9 @@ fun LoginScreen(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .fillMaxWidth()
-            )
+            ) {
+                googleSignInLauncher.launch(loginViewModel.loginWithGoogleIntent())
+            }
         }
     }
 }
