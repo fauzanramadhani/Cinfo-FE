@@ -232,15 +232,25 @@ fun RegisterScreen(
                             it.isNotEmpty() && it.length < 8 -> {
                                 passwordState.value =
                                     TextFieldState.Error("Password minimal 8 karakter")
+                                passwordConfirmationState.value = TextFieldState.Empty
                             }
 
                             it.length > 32 -> {
                                 passwordState.value =
                                     TextFieldState.Error("Password maksimal 32 karakter")
+                                passwordConfirmationState.value = TextFieldState.Empty
+                            }
+
+                            it.isNotEmpty() && passwordConfirmationValue.isNotEmpty()
+                                    && it != passwordConfirmationValue -> {
+                                passwordState.value = TextFieldState.Empty
+                                passwordConfirmationState.value =
+                                    TextFieldState.Error("Konfirmasi password tidak sesuai")
                             }
 
                             else -> {
                                 passwordState.value = TextFieldState.Empty
+                                passwordConfirmationState.value = TextFieldState.Empty
                             }
                         }
                         passwordValue = it
@@ -309,7 +319,9 @@ fun RegisterScreen(
             PrimaryButton(
                 text = "Daftar",
                 enabled = registerButtonEnabled && emailValue.isNotEmpty() && passwordValue.isNotEmpty()
-                        && passwordConfirmationValue.isNotEmpty() && passwordValue == passwordConfirmationValue,
+                        && passwordConfirmationValue.isNotEmpty() && passwordValue == passwordConfirmationValue
+                        && emailState.value !is TextFieldState.Error && passwordState.value !is TextFieldState.Error
+                        && passwordConfirmationState.value !is TextFieldState.Error,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
