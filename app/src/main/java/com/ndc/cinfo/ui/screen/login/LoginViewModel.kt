@@ -25,9 +25,6 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<UiState<AuthResult>>(UiState.Empty)
     val loginState: StateFlow<UiState<AuthResult>>
         get() = _loginState
-    private val _loginWithGoogleState = MutableStateFlow<UiState<AuthResult>>(UiState.Empty)
-    val loginWithGoogleState: StateFlow<UiState<AuthResult>>
-        get() = _loginWithGoogleState
 
     fun loginBasic(
         email: String,
@@ -42,24 +39,28 @@ class LoginViewModel @Inject constructor(
     }
 
     fun loginWithGoogleIntent(): Intent {
-        _loginWithGoogleState.tryEmit(UiState.Loading)
+        _loginState.tryEmit(UiState.Loading)
         return googleSignInClient.signInIntent
     }
 
     fun handleLoginWithGoogle(intent: Intent) = viewModelScope.launch {
         try {
             handleLoginWithGoogleUseCase.invoke(intent).addOnSuccessListener {
-                _loginWithGoogleState.tryEmit(UiState.Success(it))
+                _loginState.tryEmit(UiState.Success(it))
             }.addOnFailureListener {
-                _loginWithGoogleState.tryEmit(UiState.Error(it.message.toString()))
+                _loginState.tryEmit(UiState.Error(it.message.toString()))
             }
         } catch (e: Exception) {
-            _loginWithGoogleState.tryEmit(
+            _loginState.tryEmit(
                 when (e.message.toString()) {
                     "12501: " -> UiState.Error("Operation Canceled by User")
                     else -> UiState.Error(e.message.toString())
                 }
             )
         }
+    }
+
+    fun clearState() = viewModelScope.launch {
+        _loginState.tryEmit(UiState.Empty)
     }
 }
