@@ -30,4 +30,7 @@ class RegisterViewModel @Inject constructor(
             _registerState.tryEmit(UiState.Error(it.message.toString()))
         }
     }
+    fun clearState() = viewModelScope.launch {
+        _registerState.tryEmit(UiState.Empty)
+    }
 }

@@ -101,6 +101,7 @@ fun RegisterScreen(
                 loadingState = false
                 registerButtonEnabled = true
                 Toast(ctx, registerState.message).long()
+                registerViewModel.clearState()
             }
 
             UiState.Loading -> {

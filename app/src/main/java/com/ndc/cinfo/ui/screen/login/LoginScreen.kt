@@ -110,32 +110,7 @@ fun LoginScreen(
                 loadingState = false
                 loginButtonEnabled = true
                 loginGoogleButtonEnabled = true
-            }
-
-            UiState.Loading -> {
-                loadingState = true
-                loginButtonEnabled = false
-                loginGoogleButtonEnabled = false
-            }
-
-            is UiState.Success -> {
-                loadingState = false
-                navHostController.navigate(NavRoute.Main.route) {
-                    launchSingleTop = true
-                }
-            }
-        }
-    }
-
-    val loginWithGoogleState = loginViewModel.loginWithGoogleState.collectAsStateWithLifecycle().value
-    LaunchedEffect(loginWithGoogleState) {
-        when (loginWithGoogleState) {
-            UiState.Empty -> {}
-            is UiState.Error -> {
-                Toast(ctx, loginWithGoogleState.message).long()
-                loadingState = false
-                loginButtonEnabled = true
-                loginGoogleButtonEnabled = true
+                loginViewModel.clearState()
             }
 
             UiState.Loading -> {
