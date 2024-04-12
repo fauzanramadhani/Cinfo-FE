@@ -7,5 +7,8 @@ data class BottomNavigationItem(
     val label: String,
     val unselectedIcon: Int,
     val selectedIcon: Int,
-    val content: @Composable (paddingValues: PaddingValues) -> Unit
+    val topBar: @Composable () -> Unit,
+    val content: @Composable (
+        paddingValues: PaddingValues
+    ) -> Unit
 )
