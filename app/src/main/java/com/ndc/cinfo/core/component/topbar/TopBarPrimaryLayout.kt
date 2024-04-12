@@ -1,4 +1,4 @@
-package com.ndc.cinfo.ui.component.topbar
+package com.ndc.cinfo.core.component.topbar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

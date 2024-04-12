@@ -1,4 +1,4 @@
-package com.ndc.cinfo.core.data.authentication.repository
+package com.ndc.cinfo.data.authentication.repository
 
 import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignIn

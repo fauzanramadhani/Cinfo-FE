@@ -40,8 +40,8 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ndc.cinfo.R
-import com.ndc.cinfo.ui.component.button.PrimaryButton
-import com.ndc.cinfo.ui.component.topbar.TopBarPrimaryLayout
+import com.ndc.cinfo.core.component.button.PrimaryButton
+import com.ndc.cinfo.core.component.topbar.TopBarPrimaryLayout
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.ui.screen.main.content.AccountScreen
 import com.ndc.cinfo.ui.screen.main.content.MainScreen

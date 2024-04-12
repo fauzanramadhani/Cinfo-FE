@@ -1,8 +1,8 @@
 package com.ndc.cinfo.ui.screen.main
 
 import androidx.lifecycle.ViewModel
-import com.ndc.cinfo.core.data.authentication.domain.GetFirebaseUserUseCase
-import com.ndc.cinfo.core.data.authentication.domain.LogoutUseCase
+import com.ndc.cinfo.data.authentication.domain.GetFirebaseUserUseCase
+import com.ndc.cinfo.data.authentication.domain.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package com.ndc.cinfo.ui.component.dialog
+package com.ndc.cinfo.core.component.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

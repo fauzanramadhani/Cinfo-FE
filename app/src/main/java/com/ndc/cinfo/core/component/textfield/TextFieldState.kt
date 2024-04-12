@@ -1,4 +1,4 @@
-package com.ndc.cinfo.ui.component.textfield
+package com.ndc.cinfo.core.component.textfield
 
 sealed interface TextFieldState {
     data object Empty: TextFieldState
