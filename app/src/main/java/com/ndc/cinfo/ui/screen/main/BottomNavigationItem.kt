@@ -2,7 +2,6 @@ package com.ndc.cinfo.ui.screen.main
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
 
 data class BottomNavigationItem(
     val label: String,
