@@ -21,7 +21,6 @@ fun DialogLoading(
     modifier: Modifier = Modifier,
     visible: Boolean = false
 ) {
-    val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     if (visible) {
         Dialog(onDismissRequest = {}) {
@@ -34,12 +33,12 @@ fun DialogLoading(
                 CircularProgressIndicator(
                     strokeCap = StrokeCap.Round,
                     strokeWidth = 8.dp,
-                    color = color.onBackground,
+                    color = Color.White,
                 )
                 Text(
                     text = "Silahkan tunggu...",
                     style = typography.titleMedium,
-                    color = color.onBackground
+                    color = Color.White
                 )
             }
         }

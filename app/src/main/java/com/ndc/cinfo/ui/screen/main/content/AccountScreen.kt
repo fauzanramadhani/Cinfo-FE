@@ -30,18 +30,6 @@ fun AccountScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(text = "Account Screen")
-        Spacer(modifier = Modifier.padding(bottom = 12.dp))
-        PrimaryButton(
-            text = "Keluar"
-        ) {
-            firebaseAuth.signOut()
-            val p = navHostController.currentBackStackEntry?.destination?.route
-            Log.e("p", p.toString())
-            navHostController.navigate(NavRoute.Login.route) {
-                launchSingleTop = true
-            }
-        }
     }
 }
