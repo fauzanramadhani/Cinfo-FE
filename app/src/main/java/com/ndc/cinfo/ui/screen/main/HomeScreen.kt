@@ -2,11 +2,15 @@ package com.ndc.cinfo.ui.screen.main
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
@@ -25,10 +31,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,9 +52,9 @@ import com.ndc.cinfo.R
 import com.ndc.cinfo.core.component.button.PrimaryButton
 import com.ndc.cinfo.core.component.topbar.TopBarPrimaryLayout
 import com.ndc.cinfo.ui.navigation.NavRoute
-import com.ndc.cinfo.ui.screen.main.content.AccountScreen
-import com.ndc.cinfo.ui.screen.main.content.MainScreen
-import com.ndc.cinfo.ui.screen.main.content.RoomScreen
+import com.ndc.cinfo.ui.screen.main.content.accountScreen
+import com.ndc.cinfo.ui.screen.main.content.mainScreen
+import com.ndc.cinfo.ui.screen.main.content.roomScreen
 
 @Composable
 fun HomeScreen(
@@ -63,10 +72,10 @@ fun HomeScreen(
             label = "Utama",
             unselectedIcon = R.drawable.ic_main,
             selectedIcon = R.drawable.ic_main_fill,
-            content = { paddingValues ->
-                MainScreen(
+            lazyListState = rememberLazyListState(),
+            content = {
+                mainScreen(
                     navHostController = navHostController,
-                    paddingValues = paddingValues
                 )
             },
             topBar = {
@@ -107,10 +116,10 @@ fun HomeScreen(
             label = "Kelas Saya",
             unselectedIcon = R.drawable.ic_room,
             selectedIcon = R.drawable.ic_room_fill,
-            content = { paddingValues ->
-                RoomScreen(
-                    navHostController = navHostController,
-                    paddingValues = paddingValues
+            lazyListState = rememberLazyListState(),
+            content = {
+                roomScreen(
+                    navHostController = navHostController
                 )
             },
             topBar = {
@@ -136,10 +145,10 @@ fun HomeScreen(
             label = "Account",
             unselectedIcon = R.drawable.ic_account,
             selectedIcon = R.drawable.ic_account_fill,
-            content = { paddingValues ->
-                AccountScreen(
-                    navHostController = navHostController,
-                    paddingValues = paddingValues
+            lazyListState = rememberLazyListState(),
+            content = {
+                accountScreen(
+                    navHostController = navHostController
                 )
             },
             topBar = {
@@ -185,6 +194,14 @@ fun HomeScreen(
         mutableIntStateOf(0)
     }
 
+    var topBarVisible by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    var lastVisibleIndex by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
 
     BackHandler {
@@ -198,7 +215,15 @@ fun HomeScreen(
             .statusBarsPadding()
             .background(color = color.background)
             .safeDrawingPadding(),
-        topBar = bottomNavigationItems[selectedIndex].topBar,
+        topBar = {
+            AnimatedVisibility(
+                visible = topBarVisible,
+                enter = fadeIn(initialAlpha = 1f),
+                exit = fadeOut(targetAlpha = 0f)
+            ) {
+                bottomNavigationItems[selectedIndex].topBar.invoke()
+            }
+        },
         bottomBar = {
             Surface(
                 shadowElevation = 12.dp,
@@ -213,7 +238,31 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        bottomNavigationItems[selectedIndex].content.invoke(paddingValues)
+        val currentScreen = bottomNavigationItems[selectedIndex]
+        LaunchedEffect(currentScreen.lazyListState) {
+            snapshotFlow { currentScreen.lazyListState.firstVisibleItemIndex }
+                .collect { newIndex ->
+                    if (newIndex > lastVisibleIndex) {
+                        topBarVisible = false
+                    } else if (newIndex < lastVisibleIndex) {
+                        topBarVisible = true
+                    }
+                    lastVisibleIndex = newIndex
+                }
+        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            state = currentScreen.lazyListState,
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                top = 71.dp + 16.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            content = currentScreen.content
+        )
     }
 }
 
