@@ -15,4 +15,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Cinfo"
 include(":app")
-include(":app:cinfoadmin")
+include(":cinfoadmin")
+include(":core")

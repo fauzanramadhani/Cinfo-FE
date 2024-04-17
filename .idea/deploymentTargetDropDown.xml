@@ -11,6 +11,9 @@
       <entry key="app.cinfoadmin">
         <State />
       </entry>
+      <entry key="cinfoadmin">
+        <State />
+      </entry>
     </value>
   </component>
 </project>
