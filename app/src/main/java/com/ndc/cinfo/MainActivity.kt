@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import com.ndc.cinfo.ui.navigation.SetupNavHost
-import com.ndc.cinfo.ui.theme.CinfoTheme
+import com.ndc.core.theme.CinfoTheme
 import com.ndc.cinfo.utils.SocketHandler
 import dagger.hilt.android.AndroidEntryPoint
 

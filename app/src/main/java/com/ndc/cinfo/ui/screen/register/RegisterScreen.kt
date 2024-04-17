@@ -41,15 +41,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ndc.cinfo.R
-import com.ndc.cinfo.core.component.button.PrimaryButton
-import com.ndc.cinfo.core.component.dialog.DialogLoading
-import com.ndc.cinfo.core.component.textfield.PasswordTextField
-import com.ndc.cinfo.core.component.textfield.PrimaryTextField
-import com.ndc.cinfo.core.component.textfield.TextFieldState
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.utils.Toast
 import com.ndc.cinfo.utils.UiState
 import com.ndc.cinfo.utils.isEmailInvalid
+import com.ndc.core.component.button.PrimaryButton
+import com.ndc.core.component.dialog.DialogLoading
+import com.ndc.core.component.textfield.PasswordTextField
+import com.ndc.core.component.textfield.PrimaryTextField
+import com.ndc.core.component.textfield.TextFieldState
 
 @Composable
 fun RegisterScreen(
@@ -112,7 +112,7 @@ fun RegisterScreen(
 
             is UiState.Success -> {
                 loadingState = false
-                navHostController.navigate(NavRoute.Main.route) {
+                navHostController.navigate(NavRoute.Home.route) {
                     launchSingleTop = true
                 }
             }

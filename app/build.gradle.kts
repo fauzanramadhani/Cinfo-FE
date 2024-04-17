@@ -71,6 +71,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    // Implement core module
+    implementation(project(":core"))
     // Socket io
     implementation("io.socket:socket.io-client:2.0.0") {
         exclude(group = "org.json", module = "json")

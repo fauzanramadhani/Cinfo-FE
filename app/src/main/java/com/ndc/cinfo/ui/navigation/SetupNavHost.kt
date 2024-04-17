@@ -6,8 +6,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.ndc.cinfo.ui.screen.detail_announcement.DetailAnnouncementScreen
 import com.ndc.cinfo.ui.screen.login.LoginScreen
-import com.ndc.cinfo.ui.screen.main.HomeScreen
+import com.ndc.cinfo.ui.screen.home.HomeScreen
 import com.ndc.cinfo.ui.screen.register.RegisterScreen
 
 @Composable
@@ -19,7 +20,7 @@ fun SetupNavHost(
     NavHost(
         navController = navHostController,
         startDestination = when {
-            firebaseAuth.currentUser != null -> NavRoute.Main.route
+            firebaseAuth.currentUser != null -> NavRoute.Home.route
             else -> NavRoute.Login.route
         },
         route = NavRoute.Root.route
@@ -35,9 +36,19 @@ fun SetupNavHost(
             RegisterScreen(navHostController = navHostController)
         }
         composable(
-            route = NavRoute.Main.route
+            route = NavRoute.Home.route
         ) {
             HomeScreen(navHostController = navHostController)
+        }
+        composable(
+            route = NavRoute.Home.route
+        ) {
+            HomeScreen(navHostController = navHostController)
+        }
+        composable(
+            route = NavRoute.DetailAnnouncement.route
+        ) {
+            DetailAnnouncementScreen(navHostController = navHostController)
         }
     }
 }
