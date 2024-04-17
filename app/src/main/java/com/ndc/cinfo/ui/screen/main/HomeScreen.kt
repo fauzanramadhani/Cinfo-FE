@@ -2,6 +2,9 @@ package com.ndc.cinfo.ui.screen.main
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -27,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,10 +67,11 @@ fun HomeScreen(
             label = "Utama",
             unselectedIcon = R.drawable.ic_main,
             selectedIcon = R.drawable.ic_main_fill,
-            content = { paddingValues ->
+            content = { paddingValues, topBarVisibility ->
                 MainScreen(
                     navHostController = navHostController,
-                    paddingValues = paddingValues
+                    paddingValues = paddingValues,
+                    topBarVisibility = topBarVisibility
                 )
             },
             topBar = {
@@ -107,10 +112,11 @@ fun HomeScreen(
             label = "Kelas Saya",
             unselectedIcon = R.drawable.ic_room,
             selectedIcon = R.drawable.ic_room_fill,
-            content = { paddingValues ->
+            content = { paddingValues, topBarVisibility ->
                 RoomScreen(
                     navHostController = navHostController,
-                    paddingValues = paddingValues
+                    paddingValues = paddingValues,
+                    topBarVisibility = topBarVisibility
                 )
             },
             topBar = {
@@ -136,10 +142,11 @@ fun HomeScreen(
             label = "Account",
             unselectedIcon = R.drawable.ic_account,
             selectedIcon = R.drawable.ic_account_fill,
-            content = { paddingValues ->
+            content = { paddingValues, topBarVisibility ->
                 AccountScreen(
                     navHostController = navHostController,
-                    paddingValues = paddingValues
+                    paddingValues = paddingValues,
+                    topBarVisibility = topBarVisibility
                 )
             },
             topBar = {
@@ -185,6 +192,10 @@ fun HomeScreen(
         mutableIntStateOf(0)
     }
 
+    val topBarVisible = rememberSaveable {
+        mutableStateOf(true)
+    }
+
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
 
     BackHandler {
@@ -198,7 +209,15 @@ fun HomeScreen(
             .statusBarsPadding()
             .background(color = color.background)
             .safeDrawingPadding(),
-        topBar = bottomNavigationItems[selectedIndex].topBar,
+        topBar = {
+            AnimatedVisibility(
+                visible = topBarVisible.value,
+                enter = fadeIn(initialAlpha = 1f),
+                exit = fadeOut(targetAlpha = 0f)
+            ) {
+                bottomNavigationItems[selectedIndex].topBar.invoke()
+            }
+        },
         bottomBar = {
             Surface(
                 shadowElevation = 12.dp,
@@ -213,7 +232,10 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        bottomNavigationItems[selectedIndex].content.invoke(paddingValues)
+        bottomNavigationItems[selectedIndex].content.invoke(
+            paddingValues,
+            topBarVisible
+        )
     }
 }
 

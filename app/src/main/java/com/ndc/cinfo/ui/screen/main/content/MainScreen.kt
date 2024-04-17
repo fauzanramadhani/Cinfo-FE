@@ -3,12 +3,17 @@ package com.ndc.cinfo.ui.screen.main.content
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -19,11 +24,10 @@ import com.ndc.cinfo.utils.toDateString
 @Composable
 fun MainScreen(
     navHostController: NavHostController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    topBarVisibility: MutableState<Boolean>
 ) {
-    val dummyEvent = remember {
-        mutableStateListOf<EventResponse>()
-    }
+    val dummyEvent = mutableListOf<EventResponse>()
     for (i in 1..10) {
         dummyEvent.add(
             EventResponse(
@@ -35,13 +39,34 @@ fun MainScreen(
             )
         )
     }
+    val lazyListState = rememberLazyListState()
+    var lastVisibleIndex by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.firstVisibleItemIndex }
+            .collect { newIndex ->
+                if (newIndex > lastVisibleIndex) {
+                    topBarVisibility.value = false
+                } else if (newIndex < lastVisibleIndex) {
+                    topBarVisibility.value = true
+                }
+                lastVisibleIndex = newIndex
+            }
+    }
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .fillMaxSize(),
+        state = lazyListState,
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            bottom = paddingValues.calculateBottomPadding() + 16.dp,
+            top = 71.dp + 16.dp // must be a static value
+        ),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(
             items = dummyEvent,

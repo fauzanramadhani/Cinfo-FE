@@ -2,6 +2,7 @@ package com.ndc.cinfo.ui.screen.main
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 
 data class BottomNavigationItem(
     val label: String,
@@ -9,6 +10,7 @@ data class BottomNavigationItem(
     val selectedIcon: Int,
     val topBar: @Composable () -> Unit,
     val content: @Composable (
-        paddingValues: PaddingValues
-    ) -> Unit
+        paddingValues: PaddingValues,
+        topBarVisibility: MutableState<Boolean>
+    ) -> Unit,
 )
