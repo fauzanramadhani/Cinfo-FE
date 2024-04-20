@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -35,40 +35,12 @@ import com.ndc.core.data.event.datasource.remote.response.AnnouncementResponse
 fun RoomScreen(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
-    topBarVisibility: MutableState<Boolean>
+    lazyListState: LazyListState,
+    announcementList: List<AnnouncementResponse>,
+    onClearList: () -> Unit
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
-    val dummyEvent = remember {
-        mutableStateListOf<AnnouncementResponse>()
-    }
-    for (i in 1..10) {
-        dummyEvent.add(
-            AnnouncementResponse(
-                id = "EVENT_$i",
-                title =
-                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
-                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
-                createdAt = 1727966481000
-            )
-        )
-    }
-    val lazyListState = rememberLazyListState()
-    var lastVisibleIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .collect { newIndex ->
-                if (newIndex > lastVisibleIndex) {
-                    topBarVisibility.value = false
-                } else if (newIndex < lastVisibleIndex) {
-                    topBarVisibility.value = true
-                }
-                lastVisibleIndex = newIndex
-            }
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -83,7 +55,7 @@ fun RoomScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when {
-            dummyEvent.isEmpty() ->
+            announcementList.isEmpty() ->
                 item {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -105,17 +77,16 @@ fun RoomScreen(
 
             else ->
                 items(
-                    items = dummyEvent,
+                    items = announcementList,
                     key = { event ->
                         event.id
                     }
                 ) {
                     AnnouncementItem(
                         title = it.title,
-                        createdAt = it.createdAt.toDateString("dd MMMM yyyy")
-                    ) {
-                        dummyEvent.clear()
-                    }
+                        createdAt = it.createdAt.toDateString("dd MMMM yyyy"),
+                        onClick = onClearList
+                    )
                 }
         }
     }

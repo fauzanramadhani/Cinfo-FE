@@ -7,20 +7,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,40 +27,11 @@ import com.ndc.core.data.event.datasource.remote.response.AnnouncementResponse
 fun MainScreen(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
-    topBarVisibility: MutableState<Boolean>
+    lazyListState: LazyListState,
+    announcementList: List<AnnouncementResponse>
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
-    val dummyAnnouncement = remember {
-        mutableStateListOf<AnnouncementResponse>()
-    }
-    for (i in 1..10) {
-        dummyAnnouncement.add(
-            AnnouncementResponse(
-                id = "EVENT_$i",
-                title =
-                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
-                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
-                createdAt = 1727966481000
-            )
-        )
-    }
-    val lazyListState = rememberLazyListState()
-    var lastVisibleIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .collect { newIndex ->
-                if (newIndex > lastVisibleIndex) {
-                    topBarVisibility.value = false
-                } else if (newIndex < lastVisibleIndex) {
-                    topBarVisibility.value = true
-                }
-                lastVisibleIndex = newIndex
-            }
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -84,7 +46,7 @@ fun MainScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when {
-            dummyAnnouncement.isEmpty() ->
+            announcementList.isEmpty() ->
                 item {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -106,7 +68,7 @@ fun MainScreen(
 
             else ->
                 items(
-                    items = dummyAnnouncement,
+                    items = announcementList,
                     key = { event ->
                         event.id
                     }
