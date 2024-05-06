@@ -49,8 +49,8 @@ import androidx.navigation.NavHostController
 import com.ndc.cinfoadmin.ui.screen.home.content.MainScreen
 import com.ndc.cinfoadmin.ui.screen.home.content.RoomScreen
 import com.ndc.core.R
-import com.ndc.core.component.topbar.TopBarPrimaryLayout
-import com.ndc.core.data.event.datasource.remote.response.AnnouncementResponse
+import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
+import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
 
 
 @Composable
@@ -117,6 +117,10 @@ fun HomeScreen(
                 createdAt = 1727966481000
             )
         )
+    }
+
+    LaunchedEffect(Unit) {
+
     }
 
     LaunchedEffect(mainListState) {

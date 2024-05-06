@@ -48,14 +48,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.ndc.cinfo.R
+import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.ui.screen.home.content.AccountScreen
 import com.ndc.cinfo.ui.screen.home.content.MainScreen
 import com.ndc.cinfo.ui.screen.home.content.RoomScreen
-import com.ndc.core.component.button.PrimaryButton
-import com.ndc.core.component.topbar.TopBarPrimaryLayout
-import com.ndc.core.data.event.datasource.remote.response.AnnouncementResponse
+import com.ndc.core.ui.component.button.PrimaryButton
+import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
+import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
 
 @Composable
 fun HomeScreen(

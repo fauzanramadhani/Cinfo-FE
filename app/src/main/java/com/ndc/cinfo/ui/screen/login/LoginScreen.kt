@@ -43,18 +43,18 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.ndc.cinfo.R
+import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
-import com.ndc.cinfo.utils.Toast
-import com.ndc.cinfo.utils.UiState
+import com.ndc.core.utils.Toast
+import com.ndc.core.utils.UiState
 import com.ndc.cinfo.utils.isEmailInvalid
-import com.ndc.core.component.button.OutlinedButton
-import com.ndc.core.component.button.OutlinedIconButton
-import com.ndc.core.component.button.PrimaryButton
-import com.ndc.core.component.dialog.DialogLoading
-import com.ndc.core.component.textfield.PasswordTextField
-import com.ndc.core.component.textfield.PrimaryTextField
-import com.ndc.core.component.textfield.TextFieldState
+import com.ndc.core.ui.component.button.OutlinedButton
+import com.ndc.core.ui.component.button.OutlinedIconButton
+import com.ndc.core.ui.component.button.PrimaryButton
+import com.ndc.core.ui.component.dialog.DialogLoading
+import com.ndc.core.ui.component.textfield.PasswordTextField
+import com.ndc.core.ui.component.textfield.PrimaryTextField
+import com.ndc.core.ui.component.textfield.TextFieldState
 
 @Composable
 fun LoginScreen(

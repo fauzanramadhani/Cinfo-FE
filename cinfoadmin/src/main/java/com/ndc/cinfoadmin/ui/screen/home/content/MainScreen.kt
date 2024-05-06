@@ -20,8 +20,8 @@ import androidx.navigation.NavHostController
 import com.ndc.cinfo.utils.toDateString
 import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
-import com.ndc.core.component.item.AnnouncementItem
-import com.ndc.core.data.event.datasource.remote.response.AnnouncementResponse
+import com.ndc.core.ui.component.item.AnnouncementItem
+import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
 
 @Composable
 fun MainScreen(

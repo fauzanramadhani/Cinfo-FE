@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthResult
-import com.ndc.cinfo.utils.UiState
-import com.ndc.core.data.authentication.domain.HandleLoginWithGoogleUseCase
-import com.ndc.core.data.authentication.domain.LoginBasicUseCase
+import com.ndc.core.data.domain.HandleLoginWithGoogleUseCase
+import com.ndc.core.data.domain.LoginBasicUseCase
+import com.ndc.core.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

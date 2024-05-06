@@ -1,9 +1,12 @@
 package com.ndc.cinfoadmin.core.di.module
 
+import android.content.Context
 import com.ndc.core.utils.SharedPreferencesManager
+import com.ndc.core.utils.SocketHandler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -40,4 +43,9 @@ object NetworkModule {
 //            .build()
 //        return retrofit.create(ApiService::class.java)
 //    }
+
+    @Provides
+    fun provideSocketHandler(
+        @ApplicationContext context: Context
+    ): SocketHandler = SocketHandler(context)
 }
