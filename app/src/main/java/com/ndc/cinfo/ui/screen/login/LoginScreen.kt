@@ -47,7 +47,7 @@ import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.core.utils.Toast
 import com.ndc.core.utils.UiState
-import com.ndc.cinfo.utils.isEmailInvalid
+import com.ndc.core.utils.isEmailInvalid
 import com.ndc.core.ui.component.button.OutlinedButton
 import com.ndc.core.ui.component.button.OutlinedIconButton
 import com.ndc.core.ui.component.button.PrimaryButton

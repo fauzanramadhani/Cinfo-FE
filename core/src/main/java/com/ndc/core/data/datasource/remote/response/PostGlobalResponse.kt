@@ -1,4 +1,4 @@
-package com.ndc.core.data.post.datasource.remote.response
+package com.ndc.core.data.datasource.remote.response
 
 import com.google.gson.annotations.SerializedName
 

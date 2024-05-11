@@ -1,6 +1,7 @@
 package com.ndc.cinfoadmin.ui.screen.home
 
 import android.app.Activity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -30,9 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -45,12 +45,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ndc.cinfoadmin.ui.screen.home.content.MainScreen
 import com.ndc.cinfoadmin.ui.screen.home.content.RoomScreen
 import com.ndc.core.R
+import com.ndc.core.ui.component.dialog.DialogChangeServerAddress
 import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
-import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
+import com.ndc.core.utils.rememberRestartActivity
 
 
 @Composable
@@ -64,18 +66,7 @@ fun HomeScreen(
     val darkTheme: Boolean = isSystemInDarkTheme()
     val window = (view.context as Activity).window
     val typography = MaterialTheme.typography
-    val bottomNavigationItems = listOf(
-        BottomNavigationItem(
-            label = "Utama",
-            unselectedIcon = R.drawable.ic_main,
-            selectedIcon = R.drawable.ic_main_fill,
-        ),
-        BottomNavigationItem(
-            label = "Kelas Saya",
-            unselectedIcon = R.drawable.ic_room,
-            selectedIcon = R.drawable.ic_room_fill,
-        )
-    )
+
     var selectedIndex by rememberSaveable {
         mutableIntStateOf(0)
     }
@@ -86,17 +77,13 @@ fun HomeScreen(
     var topBarVisibleRoom by rememberSaveable {
         mutableStateOf(true)
     }
-    var mainListLastVisibleIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-    var roomListLastVisibleIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
     val mainListState = rememberLazyListState()
     val roomListState = rememberLazyListState()
-    val announcementList = remember {
-        mutableStateListOf<AnnouncementResponse>()
-    }
+    val state by homeScreenViewModel.state.collectAsStateWithLifecycle(
+        initialValue = HomeState()
+    )
+    val effect by homeScreenViewModel.onEffect.collectAsStateWithLifecycle(initialValue = HomeEffect.None)
+    val restartApp = rememberRestartActivity(activity = (ctx as ComponentActivity))
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
 
@@ -107,44 +94,38 @@ fun HomeScreen(
         }
     }
 
-    for (i in 1..10) {
-        announcementList.add(
-            AnnouncementResponse(
-                id = "EVENT_$i",
-                title =
-                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
-                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
-                createdAt = 1727966481000
-            )
-        )
-    }
-
-    LaunchedEffect(Unit) {
-
-    }
-
     LaunchedEffect(mainListState) {
         snapshotFlow { mainListState.firstVisibleItemIndex }
             .collect { newIndex ->
-                if (newIndex > mainListLastVisibleIndex) {
-                    topBarVisibleMain = false
-                } else if (newIndex < mainListLastVisibleIndex) {
-                    topBarVisibleMain = true
-                }
-                mainListLastVisibleIndex = newIndex
+                topBarVisibleMain = newIndex <= 0
             }
     }
 
     LaunchedEffect(roomListState) {
         snapshotFlow { roomListState.firstVisibleItemIndex }
             .collect { newIndex ->
-                if (newIndex > roomListLastVisibleIndex) {
-                    topBarVisibleRoom = false
-                } else if (newIndex < roomListLastVisibleIndex) {
-                    topBarVisibleRoom = true
-                }
-                roomListLastVisibleIndex = newIndex
+                topBarVisibleRoom = newIndex <= 0
             }
+    }
+
+    if (state.updateServerDialogShow) {
+        DialogChangeServerAddress(
+            modifier = Modifier.padding(24.dp),
+            addressValue = state.updateServerTvValue,
+            onAddressChange = {
+                homeScreenViewModel.onAction(HomeAction.OnUpdateServerTvChange(it))
+            },
+            onClearValue = {
+                homeScreenViewModel.onAction(HomeAction.OnUpdateServerTvChange(""))
+            },
+            onDismiss = {
+                homeScreenViewModel.onAction(HomeAction.OnUpdateServerDialogShowChange(false))
+            },
+            onConfirm = {
+                homeScreenViewModel.onAction(HomeAction.OnUpdateServer)
+                restartApp()
+            }
+        )
     }
 
     Scaffold(
@@ -155,39 +136,14 @@ fun HomeScreen(
             .background(color = color.background)
             .safeDrawingPadding(),
         topBar = {
-            AnimatedVisibility(
-                visible = when (selectedIndex) {
-                    0 -> topBarVisibleMain
-                    else -> topBarVisibleRoom
-                },
-                enter = fadeIn(initialAlpha = 1f),
-                exit = fadeOut(targetAlpha = 0f)
-            ) {
-                when (selectedIndex) {
-                    1 -> TopBarPrimaryLayout {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Text(
-                                text = "Dashboard Mahasiswa",
-                                style = typography.bodyMedium,
-                                color = color.onPrimary
-                            )
-                            Text(
-                                text = "Per-Jurusan",
-                                style = typography.labelLarge,
-                                color = color.onPrimary
-                            )
-                        }
-                    }
-
-                    else -> TopBarPrimaryLayout {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
+            when (selectedIndex) {
+                0 -> {
+                    AnimatedVisibility(
+                        visible = topBarVisibleMain,
+                        enter = fadeIn(initialAlpha = 1f),
+                        exit = fadeOut(targetAlpha = 0f)
+                    ) {
+                        TopBarPrimaryLayout {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
@@ -197,20 +153,52 @@ fun HomeScreen(
                                     color = color.onPrimary
                                 )
                                 Text(
-                                    text = "Universitas Cendekia Abditama",
+                                    text = "Per-Jurusan",
                                     style = typography.labelLarge,
                                     color = color.onPrimary
                                 )
                             }
-                            Image(
-                                painter = painterResource(id = R.drawable.uca_logo),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .background(Color.White, shape = CircleShape)
-                                    .size(36.dp)
-                            )
                         }
+                    }
+                }
 
+                1 -> {
+                    AnimatedVisibility(
+                        visible = topBarVisibleRoom,
+                        enter = fadeIn(initialAlpha = 1f),
+                        exit = fadeOut(targetAlpha = 0f)
+                    ) {
+                        TopBarPrimaryLayout {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    Text(
+                                        text = "Dashboard Mahasiswa",
+                                        style = typography.bodyMedium,
+                                        color = color.onPrimary
+                                    )
+                                    Text(
+                                        text = "Universitas Cendekia Abditama",
+                                        style = typography.labelLarge,
+                                        color = color.onPrimary
+                                    )
+                                }
+                                Image(
+                                    painter = painterResource(id = R.drawable.uca_logo),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .background(Color.White, shape = CircleShape)
+                                        .size(36.dp)
+                                )
+                            }
+
+                        }
                     }
                 }
             }
@@ -220,7 +208,7 @@ fun HomeScreen(
                 shadowElevation = 12.dp,
             ) {
                 BottomNavigationBar(
-                    bottomNavigationItems = bottomNavigationItems,
+                    bottomNavigationItems = state.bottomNavigationItems,
                     selectedIndex = selectedIndex,
                     onSelectedIndexChange = {
                         selectedIndex = it
@@ -230,7 +218,7 @@ fun HomeScreen(
         }
     ) { paddingValues ->
         when (selectedIndex) {
-            0 -> RoomScreen(
+            1 -> RoomScreen(
                 navHostController = navHostController,
                 paddingValues = paddingValues,
                 lazyListState = roomListState
@@ -240,7 +228,8 @@ fun HomeScreen(
                 navHostController = navHostController,
                 paddingValues = paddingValues,
                 lazyListState = mainListState,
-                announcementList = announcementList
+                state = state,
+                onAction = homeScreenViewModel::onAction
             )
         }
     }

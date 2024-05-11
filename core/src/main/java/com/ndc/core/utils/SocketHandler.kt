@@ -1,22 +1,25 @@
 package com.ndc.core.utils
 
-import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.ndc.core.BuildConfig
-import com.ndc.core.R
 import com.ndc.core.data.constant.PostOptions
+import com.ndc.core.data.constant.SharedPref
 import io.socket.client.IO
 import io.socket.client.Socket
-import java.net.URISyntaxException
+import io.socket.emitter.Emitter
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import javax.inject.Inject
 
-class SocketHandler(
-    val context: Context
+class SocketHandler @Inject constructor(
+    private val sharedPreferencesManager: SharedPreferencesManager,
 ) {
 
-    private lateinit var mSocket: Socket
-    private lateinit var mOptions: IO.Options
+    var mSocket: Socket? = null
+    var mOptions: IO.Options? = null
+    private val baseUrl = "http://${sharedPreferencesManager.getString(SharedPref.SERVER_ADDRESS)}"
 
     init {
         setSocket()
@@ -36,51 +39,55 @@ class SocketHandler(
                     )
                 )
                 .build()
-            mSocket = IO.socket(BuildConfig.BASE_URL, mOptions)
-        } catch (e: URISyntaxException) {
+
+            mSocket = IO.socket(baseUrl, mOptions)
+        } catch (e: Exception) {
             Log.e("SocketIO", e.message.toString())
         }
     }
 
-    inline fun <reified T> saveObserve(
-        event: String,
-        crossinline onSuccess: (data: T) -> Unit,
-        crossinline onFailure: (message: String) -> Unit
-    ) {
-        try {
-            getSocket().on(event) { response ->
-                if (!response.isNullOrEmpty()) {
-                    try {
-                        val type = object : TypeToken<T>() {}.type
-                        val result: T = Gson().fromJson(response[0].toString(), type)
-                        onSuccess(result)
-                    } catch (e: Exception) {
-                        Log.e("1", e.message.toString())
-                        onFailure(context.getString(R.string.server_error))
-                    }
+    inline fun <reified T> observe(
+        event: String
+    ): Flow<T> = callbackFlow {
+        Log.e("test", "1")
+        val listener = Emitter.Listener { response ->
+            Log.e("test", "2")
+            try {
+                if (response.isNotEmpty()) {
+                    val typeToken = object : TypeToken<T>() {}.type
+                    val result: T = Gson().fromJson(response[0].toString(), typeToken)
+                    trySend(result)
                 }
-
+            } catch (e: Exception) {
+                close(e)
+                Log.e("error", e.message.toString())
             }
-        } catch (e: Exception) {
-            onFailure(context.getString(R.string.internal_error))
-            Log.e("2", e.message.toString())
+        }
+
+        when (mSocket) {
+            null -> close(MSocketException.EmptyServerAddress)
+            else -> mSocket?.on(event, listener)
+        }
+
+
+        awaitClose {
+            mSocket?.off(event, listener)
         }
     }
 
-
-    @Synchronized
-    fun getOptions(): IO.Options = mOptions
-
-    @Synchronized
-    fun getSocket(): Socket = mSocket
-
     @Synchronized
     fun establishConnection() {
-        mSocket.connect()
+        mSocket?.connect()
     }
 
     @Synchronized
     fun closeConnection() {
-        mSocket.disconnect()
+        mSocket?.disconnect()
     }
+
+}
+
+sealed class MSocketException(message: String) : Exception(message, Throwable(message)) {
+
+    data object EmptyServerAddress : MSocketException("empty_server_address")
 }

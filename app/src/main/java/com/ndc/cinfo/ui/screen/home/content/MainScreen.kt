@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
-import com.ndc.cinfo.utils.toDateString
+import com.ndc.core.utils.toDateString
 import com.ndc.core.ui.component.item.AnnouncementItem
 import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
 

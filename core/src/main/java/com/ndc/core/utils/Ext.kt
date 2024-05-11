@@ -1,4 +1,4 @@
-package com.ndc.cinfo.utils
+package com.ndc.core.utils
 
 import java.text.SimpleDateFormat
 import java.util.Date
