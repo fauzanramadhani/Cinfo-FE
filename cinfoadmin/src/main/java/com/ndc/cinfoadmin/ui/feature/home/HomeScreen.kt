@@ -1,4 +1,4 @@
-package com.ndc.cinfoadmin.ui.screen.home
+package com.ndc.cinfoadmin.ui.feature.home
 
 import android.app.Activity
 import androidx.activity.ComponentActivity
@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
@@ -47,8 +49,9 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.ndc.cinfoadmin.ui.screen.home.content.MainScreen
-import com.ndc.cinfoadmin.ui.screen.home.content.RoomScreen
+import com.ndc.cinfoadmin.ui.feature.home.content.MainScreen
+import com.ndc.cinfoadmin.ui.feature.home.content.RoomScreen
+import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
 import com.ndc.core.ui.component.dialog.DialogChangeServerAddress
 import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
@@ -86,6 +89,15 @@ fun HomeScreen(
     val restartApp = rememberRestartActivity(activity = (ctx as ComponentActivity))
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+
+    when (effect) {
+        HomeEffect.None -> {}
+        HomeEffect.OnItemClicked -> navHostController.navigate(
+            NavRoute.Post.route
+        ) {
+            launchSingleTop = true
+        }
+    }
 
     BackHandler {
         when {
@@ -203,6 +215,41 @@ fun HomeScreen(
                 }
             }
         },
+        floatingActionButton = {
+            when (selectedIndex) {
+                0 -> FloatingActionButton(
+                    modifier = Modifier.padding(12.dp),
+                    contentColor = color.onPrimaryContainer,
+                    containerColor = color.primaryContainer,
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {
+                        navHostController.navigate(NavRoute.CreatePost.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add_post),
+                        contentDescription = ""
+                    )
+                }
+
+                1 -> FloatingActionButton(
+                    modifier = Modifier.padding(12.dp),
+                    contentColor = color.onPrimaryContainer,
+                    containerColor = color.primaryContainer,
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {
+                        // TODO
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add_room),
+                        contentDescription = ""
+                    )
+                }
+            }
+        },
         bottomBar = {
             Surface(
                 shadowElevation = 12.dp,
@@ -219,13 +266,11 @@ fun HomeScreen(
     ) { paddingValues ->
         when (selectedIndex) {
             1 -> RoomScreen(
-                navHostController = navHostController,
                 paddingValues = paddingValues,
                 lazyListState = roomListState
             )
 
             else -> MainScreen(
-                navHostController = navHostController,
                 paddingValues = paddingValues,
                 lazyListState = mainListState,
                 state = state,

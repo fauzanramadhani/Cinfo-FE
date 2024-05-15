@@ -49,9 +49,7 @@ class SocketHandler @Inject constructor(
     inline fun <reified T> observe(
         event: String
     ): Flow<T> = callbackFlow {
-        Log.e("test", "1")
         val listener = Emitter.Listener { response ->
-            Log.e("test", "2")
             try {
                 if (response.isNotEmpty()) {
                     val typeToken = object : TypeToken<T>() {}.type

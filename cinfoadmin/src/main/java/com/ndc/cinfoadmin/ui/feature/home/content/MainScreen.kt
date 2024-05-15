@@ -1,4 +1,4 @@
-package com.ndc.cinfoadmin.ui.screen.home.content
+package com.ndc.cinfoadmin.ui.feature.home.content
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import com.ndc.cinfoadmin.ui.navigation.NavRoute
-import com.ndc.cinfoadmin.ui.screen.home.HomeAction
-import com.ndc.cinfoadmin.ui.screen.home.HomeState
+import com.ndc.cinfoadmin.ui.feature.home.HomeAction
+import com.ndc.cinfoadmin.ui.feature.home.HomeState
 import com.ndc.core.R
 import com.ndc.core.ui.component.button.PrimaryButton
 import com.ndc.core.ui.component.item.AnnouncementItem
@@ -31,7 +29,6 @@ import com.ndc.core.utils.toDateString
 
 @Composable
 fun MainScreen(
-    navHostController: NavHostController,
     paddingValues: PaddingValues,
     lazyListState: LazyListState,
     state: HomeState,
@@ -126,9 +123,14 @@ fun MainScreen(
                         title = it.title,
                         createdAt = it.createdAt.toDateString("dd MMMM yyyy")
                     ) {
-                        navHostController.navigate(NavRoute.DetailAnnouncement.route) {
-                            launchSingleTop = true
-                        }
+                        onAction(
+                            HomeAction.OnItemClicked(
+                                id = it.id,
+                                title = it.title,
+                                description = it.description,
+                                createdAt = it.createdAt
+                            )
+                        )
                     }
                 }
         }

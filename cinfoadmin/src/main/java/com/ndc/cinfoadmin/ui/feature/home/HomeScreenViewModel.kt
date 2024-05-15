@@ -1,4 +1,4 @@
-package com.ndc.cinfoadmin.ui.screen.home
+package com.ndc.cinfoadmin.ui.feature.home
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -45,11 +45,32 @@ class HomeScreenViewModel @Inject constructor(
             }
 
             is HomeAction.OnUpdateServer -> updateServerAddressUseCase.invoke(state.value.updateServerTvValue)
+            is HomeAction.OnItemClicked -> putPostIntoSavedHandleState(
+                id = action.id,
+                title = action.title,
+                description = action.description,
+                createdAt = action.createdAt
+            ).also {
+                sendEffect(HomeEffect.OnItemClicked)
+            }
+        }
+    }
+
+    private fun putPostIntoSavedHandleState(
+        id: String,
+        title: String,
+        description: String,
+        createdAt: Long
+    ) {
+        sharedPreferencesManager.apply {
+            saveString(SharedPref.POST_ID, id)
+            saveString(SharedPref.POST_TITLE, title)
+            saveString(SharedPref.POST_DESCRIPTION, description)
+            saveLong(SharedPref.POST_CREATED_AT, createdAt)
         }
     }
 
     private fun observePostGlobal() = viewModelScope.launch {
-        val baseUrl = "http://${sharedPreferencesManager.getString(SharedPref.SERVER_ADDRESS)}"
         observePostGlobalUseCase.invoke()
             .onStart {
                 updateState {

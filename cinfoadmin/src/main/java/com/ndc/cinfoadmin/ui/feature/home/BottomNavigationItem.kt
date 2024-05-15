@@ -1,4 +1,4 @@
-package com.ndc.cinfoadmin.ui.screen.home
+package com.ndc.cinfoadmin.ui.feature.home
 
 data class BottomNavigationItem(
     val label: String,

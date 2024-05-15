@@ -31,6 +31,14 @@ class SharedPreferencesManager(context: Context) {
             apply()
         }
     }
+    fun saveLong(key: String, value: Long) = with(sharedPreferences.edit()) {
+        putLong(key, value)
+        apply()
+    }
+
+    fun getLong(key: String, defaultValue: Long = 0L): Long =
+        sharedPreferences.getLong(key, defaultValue)
+
     fun getInt(key: String, defaultValue: Int = 0): Int {
         return sharedPreferences.getInt(key, defaultValue)
     }

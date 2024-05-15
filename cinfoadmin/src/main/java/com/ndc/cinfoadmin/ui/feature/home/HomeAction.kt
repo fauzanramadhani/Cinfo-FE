@@ -1,4 +1,4 @@
-package com.ndc.cinfoadmin.ui.screen.home
+package com.ndc.cinfoadmin.ui.feature.home
 
 sealed interface HomeAction {
     data class OnUpdateServerDialogShowChange(
@@ -13,4 +13,10 @@ sealed interface HomeAction {
 
     // Main Screen
     data object OnObservePostGlobal : HomeAction
+    data class OnItemClicked(
+        val id: String,
+        val title: String,
+        val description: String,
+        val createdAt: Long
+    ) : HomeAction
 }
