@@ -33,8 +33,11 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
+import com.ndc.core.ui.component.dialog.DialogLoading
 import com.ndc.core.ui.component.textfield.BaseBasicTextField
+import com.ndc.core.utils.Toast
 import com.ndc.core.utils.toDateString
 
 @Composable
@@ -56,6 +59,25 @@ fun CreatePostScreen(
     val window = (view.context as Activity).window
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+
+    when (effect) {
+        CreatePostEffect.None -> {}
+        CreatePostEffect.OnCreatePostSuccess -> navHostController.navigate(NavRoute.Home.route) {
+            launchSingleTop = true
+        }
+    }
+
+    DialogLoading(
+        visible = state.createPostLoading
+    )
+
+//    LaunchedEffect(state.createPostError) {
+//
+//    }
+
+    state.createPostError?.let {
+        Toast(ctx, it).short()
+    }
 
     Column(
         modifier = Modifier
@@ -90,9 +112,9 @@ fun CreatePostScreen(
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable(
-                        enabled = state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty(),
+                        enabled = state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty() && !state.createPostLoading,
                         onClick = {
-                            createPostViewModel.onAction(CreatePostAction.OnDone)
+                            createPostViewModel.onAction(CreatePostAction.CreatePost)
                         }
                     )
             )

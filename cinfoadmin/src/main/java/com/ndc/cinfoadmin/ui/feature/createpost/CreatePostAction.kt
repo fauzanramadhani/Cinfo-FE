@@ -1,7 +1,7 @@
 package com.ndc.cinfoadmin.ui.feature.createpost
 
 sealed interface CreatePostAction {
-    data object OnDone: CreatePostAction
+    data object CreatePost: CreatePostAction
     data class OnTitleValueChange(
         val value: String,
     ): CreatePostAction
