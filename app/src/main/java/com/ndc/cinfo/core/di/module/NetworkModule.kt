@@ -5,7 +5,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.ndc.cinfo.BuildConfig
-import com.ndc.cinfo.utils.SharedPreferencesManager
+import com.ndc.core.utils.SharedPreferencesManager
+import com.ndc.core.utils.SocketHandler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,4 +61,9 @@ object NetworkModule {
             .build()
         return GoogleSignIn.getClient(context, gso)
     }
+
+    @Provides
+    fun provideSocketHandler(
+        @ApplicationContext context: Context
+    ): SocketHandler = SocketHandler(context)
 }

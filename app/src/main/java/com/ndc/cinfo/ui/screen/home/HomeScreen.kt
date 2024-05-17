@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
@@ -28,11 +29,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,13 +48,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.ndc.cinfo.R
+import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.ui.screen.home.content.AccountScreen
 import com.ndc.cinfo.ui.screen.home.content.MainScreen
 import com.ndc.cinfo.ui.screen.home.content.RoomScreen
-import com.ndc.core.component.button.PrimaryButton
-import com.ndc.core.component.topbar.TopBarPrimaryLayout
+import com.ndc.core.ui.component.button.PrimaryButton
+import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
+import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
 
 @Composable
 fun HomeScreen(
@@ -67,139 +73,40 @@ fun HomeScreen(
             label = "Utama",
             unselectedIcon = R.drawable.ic_main,
             selectedIcon = R.drawable.ic_main_fill,
-            content = { paddingValues, topBarVisibility ->
-                MainScreen(
-                    navHostController = navHostController,
-                    paddingValues = paddingValues,
-                    topBarVisibility = topBarVisibility
-                )
-            },
-            topBar = {
-                TopBarPrimaryLayout {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Text(
-                                text = "Dashboard Mahasiswa",
-                                style = typography.bodyMedium,
-                                color = color.onPrimary
-                            )
-                            Text(
-                                text = "Universitas Cendekia Abditama",
-                                style = typography.labelLarge,
-                                color = color.onPrimary
-                            )
-                        }
-                        Image(
-                            painter = painterResource(id = R.drawable.uca_logo),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .background(Color.White, shape = CircleShape)
-                                .size(36.dp)
-                        )
-                    }
-
-                }
-            }
         ),
         BottomNavigationItem(
             label = "Kelas Saya",
             unselectedIcon = R.drawable.ic_room,
-            selectedIcon = R.drawable.ic_room_fill,
-            content = { paddingValues, topBarVisibility ->
-                RoomScreen(
-                    navHostController = navHostController,
-                    paddingValues = paddingValues,
-                    topBarVisibility = topBarVisibility
-                )
-            },
-            topBar = {
-                TopBarPrimaryLayout {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        Text(
-                            text = "Teknik Informatika",
-                            style = typography.bodyMedium,
-                            color = color.onPrimary
-                        )
-                        Text(
-                            text = "Angkatan 2020",
-                            style = typography.labelLarge,
-                            color = color.onPrimary
-                        )
-                    }
-                }
-            }
+            selectedIcon = R.drawable.ic_room_fill
         ),
         BottomNavigationItem(
             label = "Account",
             unselectedIcon = R.drawable.ic_account,
-            selectedIcon = R.drawable.ic_account_fill,
-            content = { paddingValues, topBarVisibility ->
-                AccountScreen(
-                    navHostController = navHostController,
-                    paddingValues = paddingValues,
-                    topBarVisibility = topBarVisibility
-                )
-            },
-            topBar = {
-                TopBarPrimaryLayout {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Anda masuk sebagai:",
-                            style = typography.bodyMedium,
-                            color = color.onPrimary
-                        )
-                        Text(
-                            text = homeScreenViewModel.firebaseUser()?.email ?: "",
-                            style = typography.labelLarge,
-                            color = color.onPrimary,
-                            modifier = Modifier
-                                .padding(top = 2.dp)
-                        )
-                        PrimaryButton(
-                            text = "Keluar",
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = color.errorContainer,
-                                contentColor = color.error,
-                                disabledContainerColor = color.surfaceVariant,
-                            ),
-                            modifier = Modifier
-                                .padding(top = 24.dp)
-                                .fillMaxWidth()
-                        ) {
-                            homeScreenViewModel.logout()
-                            navHostController.navigate(NavRoute.Login.route) {
-                                launchSingleTop = true
-                            }
-                        }
-                    }
-                }
-            }
+            selectedIcon = R.drawable.ic_account_fill
         ),
     )
     var selectedIndex by rememberSaveable {
         mutableIntStateOf(0)
     }
-
-    val topBarVisibleMain = rememberSaveable {
+    var topBarVisibleMain by rememberSaveable {
         mutableStateOf(true)
     }
-    val topBarVisibleRoom = rememberSaveable {
+    var topBarVisibleRoom by rememberSaveable {
         mutableStateOf(true)
     }
-    val topBarVisibleAccount = rememberSaveable {
-        mutableStateOf(true)
+    val mainListState = rememberLazyListState()
+    var mainListLastVisibleIndex by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+    val roomListState = rememberLazyListState()
+    var roomListLastVisibleIndex by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+    val announcementMainList = remember {
+        mutableStateListOf<AnnouncementResponse>()
+    }
+    val announcementRoomList = remember {
+        mutableStateListOf<AnnouncementResponse>()
     }
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
@@ -209,6 +116,51 @@ fun HomeScreen(
             selectedIndex != 0 -> selectedIndex = 0
             else -> (ctx as Activity).finish()
         }
+    }
+
+    for (i in 1..10) {
+        announcementMainList.add(
+            AnnouncementResponse(
+                id = "EVENT_$i",
+                title =
+                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
+                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
+                createdAt = 1727966481000
+            )
+        )
+        announcementRoomList.add(
+            AnnouncementResponse(
+                id = "EVENT_$i",
+                title =
+                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
+                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
+                createdAt = 1727966481000
+            )
+        )
+    }
+
+    LaunchedEffect(mainListState) {
+        snapshotFlow { mainListState.firstVisibleItemIndex }
+            .collect { newIndex ->
+                if (newIndex > mainListLastVisibleIndex) {
+                    topBarVisibleMain = false
+                } else if (newIndex < mainListLastVisibleIndex) {
+                    topBarVisibleMain = true
+                }
+                mainListLastVisibleIndex = newIndex
+            }
+    }
+
+    LaunchedEffect(roomListState) {
+        snapshotFlow { roomListState.firstVisibleItemIndex }
+            .collect { newIndex ->
+                if (newIndex > roomListLastVisibleIndex) {
+                    topBarVisibleRoom = false
+                } else if (newIndex < roomListLastVisibleIndex) {
+                    topBarVisibleRoom = true
+                }
+                roomListLastVisibleIndex = newIndex
+            }
     }
 
     Scaffold(
@@ -221,14 +173,99 @@ fun HomeScreen(
         topBar = {
             AnimatedVisibility(
                 visible = when (selectedIndex) {
-                    0 -> topBarVisibleMain.value
-                    1 -> topBarVisibleRoom.value
-                    else -> topBarVisibleAccount.value
+                    1 -> topBarVisibleRoom
+                    2 -> true
+                    else -> topBarVisibleMain
                 },
                 enter = fadeIn(initialAlpha = 1f),
                 exit = fadeOut(targetAlpha = 0f)
             ) {
-                bottomNavigationItems[selectedIndex].topBar.invoke()
+                when (selectedIndex) {
+                    1 -> TopBarPrimaryLayout {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                text = "Teknik Informatika",
+                                style = typography.bodyMedium,
+                                color = color.onPrimary
+                            )
+                            Text(
+                                text = "Angkatan 2020",
+                                style = typography.labelLarge,
+                                color = color.onPrimary
+                            )
+                        }
+                    }
+
+                    2 -> TopBarPrimaryLayout {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Anda masuk sebagai:",
+                                style = typography.bodyMedium,
+                                color = color.onPrimary
+                            )
+                            Text(
+                                text = homeScreenViewModel.firebaseUser()?.email ?: "",
+                                style = typography.labelLarge,
+                                color = color.onPrimary,
+                                modifier = Modifier
+                                    .padding(top = 2.dp)
+                            )
+                            PrimaryButton(
+                                text = "Keluar",
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = color.errorContainer,
+                                    contentColor = color.error,
+                                    disabledContainerColor = color.surfaceVariant,
+                                ),
+                                modifier = Modifier
+                                    .padding(top = 24.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                homeScreenViewModel.logout()
+                                navHostController.navigate(NavRoute.Login.route) {
+                                    launchSingleTop = true
+                                }
+                            }
+                        }
+                    }
+
+                    else -> TopBarPrimaryLayout {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Text(
+                                    text = "Dashboard Mahasiswa",
+                                    style = typography.bodyMedium,
+                                    color = color.onPrimary
+                                )
+                                Text(
+                                    text = "Universitas Cendekia Abditama",
+                                    style = typography.labelLarge,
+                                    color = color.onPrimary
+                                )
+                            }
+                            Image(
+                                painter = painterResource(id = R.drawable.uca_logo),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .background(Color.White, shape = CircleShape)
+                                    .size(36.dp)
+                            )
+                        }
+
+                    }
+                }
             }
         },
         bottomBar = {
@@ -245,14 +282,29 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        bottomNavigationItems[selectedIndex].content.invoke(
-            paddingValues,
-            when (selectedIndex) {
-                0 -> topBarVisibleMain
-                1 -> topBarVisibleRoom
-                else -> topBarVisibleAccount
-            }
-        )
+        when (selectedIndex) {
+            1 -> RoomScreen(
+                navHostController = navHostController,
+                paddingValues = paddingValues,
+                lazyListState = roomListState,
+                announcementList = announcementRoomList,
+                onClearList = {
+                    announcementRoomList.clear()
+                }
+            )
+
+            2 -> AccountScreen(
+                navHostController = navHostController,
+                paddingValues = paddingValues,
+            )
+
+            else -> MainScreen(
+                navHostController = navHostController,
+                paddingValues = paddingValues,
+                lazyListState = mainListState,
+                announcementList = announcementMainList
+            )
+        }
     }
 }
 

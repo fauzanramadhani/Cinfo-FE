@@ -1,7 +1,7 @@
 package com.ndc.cinfo.core.di.module
 
 import android.content.Context
-import com.ndc.cinfo.utils.SharedPreferencesManager
+import com.ndc.core.utils.SharedPreferencesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

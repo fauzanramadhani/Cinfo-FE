@@ -25,8 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
-import com.ndc.cinfo.R
-import com.ndc.cinfo.utils.toDateString
+import com.ndc.core.R
+import com.ndc.core.utils.toDateString
 
 @Composable
 fun DetailAnnouncementScreen(

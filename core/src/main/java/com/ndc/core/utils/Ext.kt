@@ -1,4 +1,4 @@
-package com.ndc.cinfo.utils
+package com.ndc.core.utils
 
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -9,7 +9,7 @@ fun String.isEmailInvalid(): Boolean {
     return !(emailRegex.matches(this))
 }
 
-fun Long.toDateString(pattern: String): String {
+fun Long.toDateString(pattern: String = "dd MMMM yyyy"): String {
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     return dateFormat.format(Date(this))
 }
