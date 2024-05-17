@@ -5,6 +5,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ndc.core.data.constant.PostOptions
 import com.ndc.core.data.constant.SharedPref
+import com.ndc.core.data.datasource.remote.response.AckResponse
+import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -58,7 +60,7 @@ class SocketHandler @Inject constructor(
                 }
             } catch (e: Exception) {
                 close(e)
-                Log.e("error", e.message.toString())
+                Log.e("error observing", e.message.toString())
             }
         }
 
@@ -67,9 +69,28 @@ class SocketHandler @Inject constructor(
             else -> mSocket?.on(event, listener)
         }
 
-
         awaitClose {
             mSocket?.off(event, listener)
+        }
+    }
+
+    fun emit(event: String, body: String): Flow<Unit> = callbackFlow {
+        when (mSocket) {
+            null -> close(MSocketException.EmptyServerAddress)
+            else -> {
+                mSocket?.emit(event, body, Ack { responseJson ->
+                    val result =
+                        Gson().fromJson(responseJson[0].toString(), AckResponse::class.java)
+                    if (result.status == "error" && result.message != null) {
+                        close(MSocketException.ServerError(result.message))
+                    } else trySend(Unit)
+
+                })
+            }
+        }
+
+        awaitClose {
+            mSocket?.off(event)
         }
     }
 
@@ -88,4 +109,26 @@ class SocketHandler @Inject constructor(
 sealed class MSocketException(message: String) : Exception(message, Throwable(message)) {
 
     data object EmptyServerAddress : MSocketException("empty_server_address")
+    class ServerError(messageError: String) : MSocketException(message = messageError)
 }
+
+fun main() {
+    val test = Test(
+        angkatan = "Angkatan 2023",
+        anggota = listOf(
+            "Fauzan",
+            "Gracia",
+            "Ramadhani"
+        ),
+        deskripsi = "Wakwaw"
+    )
+
+    val testJson = Gson().toJson(test) // Ubah menjadi format json
+    println(testJson)
+}
+
+data class Test(
+    val angkatan: String,
+    val anggota: List<String>,
+    val deskripsi: String
+)
