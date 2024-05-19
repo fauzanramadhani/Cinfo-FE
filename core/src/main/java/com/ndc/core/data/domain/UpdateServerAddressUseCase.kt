@@ -1,6 +1,5 @@
 package com.ndc.core.data.domain
 
-import com.ndc.core.data.repository.PostRepository
 import com.ndc.core.data.repository.ServerConfigRepository
 import javax.inject.Inject
 
