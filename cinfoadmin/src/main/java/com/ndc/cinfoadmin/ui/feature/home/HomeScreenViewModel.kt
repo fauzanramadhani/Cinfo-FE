@@ -2,7 +2,6 @@ package com.ndc.cinfoadmin.ui.feature.home
 
 import androidx.lifecycle.viewModelScope
 import com.ndc.core.data.base.BaseViewModel
-import com.ndc.core.data.constant.SharedPref
 import com.ndc.core.data.domain.ObservePostGlobalUseCase
 import com.ndc.core.data.domain.ObserveRoomUseCase
 import com.ndc.core.data.domain.SavePostCacheUseCase
