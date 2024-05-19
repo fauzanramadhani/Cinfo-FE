@@ -4,9 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.ndc.core.data.base.BaseViewModel
 import com.ndc.core.data.constant.SharedPref
 import com.ndc.core.data.domain.ObservePostGlobalUseCase
+import com.ndc.core.data.domain.ObserveRoomUseCase
+import com.ndc.core.data.domain.SavePostCacheUseCase
 import com.ndc.core.data.domain.UpdatePostGlobalOffsetUseCase
+import com.ndc.core.data.domain.UpdateRoomOffsetUseCase
 import com.ndc.core.data.domain.UpdateServerAddressUseCase
-import com.ndc.core.utils.SharedPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -21,7 +23,9 @@ class HomeScreenViewModel @Inject constructor(
     private val observePostGlobalUseCase: ObservePostGlobalUseCase,
     private val updatePostGlobalOffsetUseCase: UpdatePostGlobalOffsetUseCase,
     private val updateServerAddressUseCase: UpdateServerAddressUseCase,
-    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val savePostCacheUseCase: SavePostCacheUseCase,
+    private val observeRoomUseCase: ObserveRoomUseCase,
+    private val updateRoomOffsetUseCase: UpdateRoomOffsetUseCase
 ) : BaseViewModel<HomeState, HomeAction, HomeEffect>(
     HomeState()
 ) {
@@ -44,28 +48,12 @@ class HomeScreenViewModel @Inject constructor(
             }
 
             is HomeAction.OnUpdateServer -> updateServerAddressUseCase.invoke(state.value.updateServerTvValue)
-            is HomeAction.OnItemClicked -> putPostIntoSavedHandleState(
-                id = action.id,
-                title = action.title,
-                description = action.description,
-                createdAt = action.createdAt
-            ).also {
-                sendEffect(HomeEffect.OnItemClicked)
-            }
-        }
-    }
+            is HomeAction.OnItemPostGlobalClicked -> savePostCacheUseCase.invoke(action.post)
+                .also {
+                    sendEffect(HomeEffect.OnItemClicked)
+                }
 
-    private fun putPostIntoSavedHandleState(
-        id: String,
-        title: String,
-        description: String,
-        createdAt: Long
-    ) {
-        sharedPreferencesManager.apply {
-            saveString(SharedPref.POST_ID, id)
-            saveString(SharedPref.POST_TITLE, title)
-            saveString(SharedPref.POST_DESCRIPTION, description)
-            saveLong(SharedPref.POST_CREATED_AT, createdAt)
+            HomeAction.OnObserveRoom -> TODO()
         }
     }
 
@@ -75,7 +63,7 @@ class HomeScreenViewModel @Inject constructor(
                 updateState {
                     copy(
                         loadingPostGlobal = true,
-                        errorPostGlobalMessage = null
+                        errorLoadPostGlobal = null
                     )
                 }
             }
@@ -83,6 +71,7 @@ class HomeScreenViewModel @Inject constructor(
                 Pair(it.id, it)
             }
             .onEach { response ->
+                updatePostGlobalOffsetUseCase.invoke(response.first)
 
                 val sortedMap = (state.value.postGlobalMap + response)
                     .toList()
@@ -90,8 +79,6 @@ class HomeScreenViewModel @Inject constructor(
                         it.second.createdAt
                     }
                     .toMap()
-
-                updatePostGlobalOffsetUseCase.invoke(sortedMap.keys.last())
 
                 updateState {
                     copy(
@@ -104,7 +91,7 @@ class HomeScreenViewModel @Inject constructor(
                 updateState {
                     copy(
                         loadingPostGlobal = false,
-                        errorPostGlobalMessage = error
+                        errorLoadPostGlobal = error
                     )
                 }
             }

@@ -2,6 +2,7 @@ package com.ndc.cinfoadmin.ui.feature.home
 
 import com.ndc.core.R
 import com.ndc.core.data.datasource.remote.response.PostGlobalResponse
+import com.ndc.core.data.datasource.remote.response.RoomResponse
 
 data class HomeState(
     // Root
@@ -17,10 +18,15 @@ data class HomeState(
             selectedIcon = R.drawable.ic_room_fill,
         )
     ),
+    val updateServerDialogShow: Boolean = false,
+    val updateServerTvValue: String = "",
     // Main Screen
     val loadingPostGlobal: Boolean = false,
     val postGlobalMap: Map<String, PostGlobalResponse> = mapOf(),
-    val errorPostGlobalMessage: Throwable? = null,
-    val updateServerDialogShow: Boolean = false,
-    val updateServerTvValue: String = ""
+    val errorLoadPostGlobal: Throwable? = null,
+
+    // Room Screen
+    val loadingRoom: Boolean = false,
+    val roomMap: Map<String, RoomResponse> = mapOf(),
+    val errorLoadRoom: Throwable? = null,
 )

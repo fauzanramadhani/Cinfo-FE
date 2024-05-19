@@ -3,7 +3,7 @@ package com.ndc.core.utils
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.ndc.core.data.constant.PostOptions
+import com.ndc.core.data.constant.Options
 import com.ndc.core.data.constant.SharedPref
 import com.ndc.core.data.datasource.remote.response.AckResponse
 import io.socket.client.Ack
@@ -37,7 +37,7 @@ class SocketHandler @Inject constructor(
             mOptions = IO.Options.builder()
                 .setAuth(
                     hashMapOf(
-                        PostOptions.POST_GLOBAL_OFFSET to "0"
+                        Options.POST_GLOBAL_OFFSET to "0"
                     )
                 )
                 .build()

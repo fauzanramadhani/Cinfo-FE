@@ -17,18 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
-import com.ndc.core.utils.toDateString
+import com.ndc.core.R
+import com.ndc.core.data.datasource.remote.response.PostGlobalResponse
 import com.ndc.core.ui.component.item.AnnouncementItem
-import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
+import com.ndc.core.utils.toDateString
 
 @Composable
 fun MainScreen(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
     lazyListState: LazyListState,
-    announcementList: List<AnnouncementResponse>
+    announcementList: List<PostGlobalResponse>
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography

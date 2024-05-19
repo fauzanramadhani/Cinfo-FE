@@ -18,16 +18,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ndc.core.R
-import com.ndc.core.utils.toDateString
+import com.ndc.core.data.datasource.remote.response.PostGlobalResponse
 import com.ndc.core.ui.component.item.AnnouncementItem
-import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
+import com.ndc.core.utils.toDateString
 
 @Composable
 fun RoomScreen(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
     lazyListState: LazyListState,
-    announcementList: List<AnnouncementResponse>,
+    announcementList: List<PostGlobalResponse>,
     onClearList: () -> Unit
 ) {
     val color = MaterialTheme.colorScheme

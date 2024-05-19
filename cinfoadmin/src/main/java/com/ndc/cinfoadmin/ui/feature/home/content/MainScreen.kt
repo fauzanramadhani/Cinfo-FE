@@ -51,7 +51,7 @@ fun MainScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when {
-            state.errorPostGlobalMessage != null -> item {
+            state.errorLoadPostGlobal != null -> item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -64,18 +64,18 @@ fun MainScreen(
                     )
                     Spacer(modifier = Modifier.padding(bottom = 16.dp))
                     Text(
-                        text = when (state.errorPostGlobalMessage) {
+                        text = when (state.errorLoadPostGlobal) {
                             is MSocketException.EmptyServerAddress -> "Alamat server masih kosong"
-                            else -> state.errorPostGlobalMessage.message.toString()
+                            else -> state.errorLoadPostGlobal.message.toString()
                         },
                         style = typography.bodyMedium,
                         color = color.onBackground
                     )
 
                     Text(
-                        text = when (state.errorPostGlobalMessage) {
+                        text = when (state.errorLoadPostGlobal) {
                             is MSocketException.EmptyServerAddress -> "Silahkan perbarui alamat server"
-                            else -> state.errorPostGlobalMessage.message.toString()
+                            else -> state.errorLoadPostGlobal.message.toString()
                         },
                         style = typography.bodyMedium,
                         color = color.onBackground
@@ -124,12 +124,7 @@ fun MainScreen(
                         createdAt = it.createdAt.toDateString("dd MMMM yyyy")
                     ) {
                         onAction(
-                            HomeAction.OnItemClicked(
-                                id = it.id,
-                                title = it.title,
-                                description = it.description,
-                                createdAt = it.createdAt
-                            )
+                            HomeAction.OnItemPostGlobalClicked(it)
                         )
                     }
                 }

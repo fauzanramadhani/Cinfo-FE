@@ -1,14 +1,13 @@
 package com.ndc.cinfoadmin.ui.feature.post
 
 import com.ndc.core.data.base.BaseViewModel
-import com.ndc.core.data.constant.SharedPref
-import com.ndc.core.utils.SharedPreferencesManager
+import com.ndc.core.data.domain.GetPostCacheUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val sharedPreferencesManager: SharedPreferencesManager
+    private val getPostCacheUseCase: GetPostCacheUseCase,
 ) : BaseViewModel<PostState, PostAction, PostEffect>(
     PostState()
 ) {
@@ -42,17 +41,14 @@ class PostViewModel @Inject constructor(
     }
 
     private fun setData() {
-        val getId = sharedPreferencesManager.getString(SharedPref.POST_ID)
-        val getTitle = sharedPreferencesManager.getString(SharedPref.POST_TITLE)
-        val getDescription = sharedPreferencesManager.getString(SharedPref.POST_DESCRIPTION)
-        val getCreatedAt = sharedPreferencesManager.getLong(SharedPref.POST_CREATED_AT)
+        val postCache = getPostCacheUseCase.invoke()
 
         updateState {
             copy(
-                id = getId,
-                title = getTitle,
-                description = getDescription,
-                createdAt = getCreatedAt
+                id = postCache.id,
+                title = postCache.title,
+                description = postCache.description,
+                createdAt = postCache.createdAt
             )
         }
     }

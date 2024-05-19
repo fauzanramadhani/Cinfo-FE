@@ -6,4 +6,5 @@ object SharedPref {
     const val POST_TITLE = "post_title"
     const val POST_DESCRIPTION = "post_description"
     const val POST_CREATED_AT = "post_created_at"
+    const val POST_CLIENT_OFFSET = "post_client_offset"
 }

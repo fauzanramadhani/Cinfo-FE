@@ -48,14 +48,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.ui.screen.home.content.AccountScreen
 import com.ndc.cinfo.ui.screen.home.content.MainScreen
 import com.ndc.cinfo.ui.screen.home.content.RoomScreen
+import com.ndc.core.R
+import com.ndc.core.data.datasource.remote.response.PostGlobalResponse
 import com.ndc.core.ui.component.button.PrimaryButton
 import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
-import com.ndc.core.data.datasource.remote.response.AnnouncementResponse
 
 @Composable
 fun HomeScreen(
@@ -103,10 +103,10 @@ fun HomeScreen(
         mutableIntStateOf(0)
     }
     val announcementMainList = remember {
-        mutableStateListOf<AnnouncementResponse>()
+        mutableStateListOf<PostGlobalResponse>()
     }
     val announcementRoomList = remember {
-        mutableStateListOf<AnnouncementResponse>()
+        mutableStateListOf<PostGlobalResponse>()
     }
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
@@ -120,20 +120,24 @@ fun HomeScreen(
 
     for (i in 1..10) {
         announcementMainList.add(
-            AnnouncementResponse(
+            PostGlobalResponse(
                 id = "EVENT_$i",
                 title =
                 if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
                 else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
+                description = "",
+                clientOffset = 0,
                 createdAt = 1727966481000
             )
         )
         announcementRoomList.add(
-            AnnouncementResponse(
+            PostGlobalResponse(
                 id = "EVENT_$i",
                 title =
                 if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
                 else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
+                description = "",
+                clientOffset = 0,
                 createdAt = 1727966481000
             )
         )
