@@ -24,5 +24,5 @@ sealed interface HomeAction {
     data object OnObserveRoom : HomeAction
     data class OnItemRoomClicked(
         val room: RoomResponse
-    )
+    ) : HomeAction
 }

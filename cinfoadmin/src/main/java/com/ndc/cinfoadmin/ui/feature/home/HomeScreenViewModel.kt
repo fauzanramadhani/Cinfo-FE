@@ -5,6 +5,7 @@ import com.ndc.core.data.base.BaseViewModel
 import com.ndc.core.data.domain.ObservePostGlobalUseCase
 import com.ndc.core.data.domain.ObserveRoomUseCase
 import com.ndc.core.data.domain.SavePostCacheUseCase
+import com.ndc.core.data.domain.SaveRoomIdCacheUseCase
 import com.ndc.core.data.domain.UpdatePostGlobalOffsetUseCase
 import com.ndc.core.data.domain.UpdateRoomOffsetUseCase
 import com.ndc.core.data.domain.UpdateServerAddressUseCase
@@ -24,13 +25,15 @@ class HomeScreenViewModel @Inject constructor(
     private val updateServerAddressUseCase: UpdateServerAddressUseCase,
     private val savePostCacheUseCase: SavePostCacheUseCase,
     private val observeRoomUseCase: ObserveRoomUseCase,
-    private val updateRoomOffsetUseCase: UpdateRoomOffsetUseCase
+    private val updateRoomOffsetUseCase: UpdateRoomOffsetUseCase,
+    private val saveRoomIdCacheUseCase: SaveRoomIdCacheUseCase
 ) : BaseViewModel<HomeState, HomeAction, HomeEffect>(
     HomeState()
 ) {
 
     init {
         onAction(HomeAction.OnObservePostGlobal)
+        onAction(HomeAction.OnObserveRoom)
     }
 
     override fun onAction(action: HomeAction) {
@@ -52,7 +55,8 @@ class HomeScreenViewModel @Inject constructor(
                     sendEffect(HomeEffect.OnItemClicked)
                 }
 
-            HomeAction.OnObserveRoom -> TODO()
+            HomeAction.OnObserveRoom -> observeRoom()
+            is HomeAction.OnItemRoomClicked -> saveRoomIdCacheUseCase.invoke(action.room.id)
         }
     }
 
@@ -70,7 +74,7 @@ class HomeScreenViewModel @Inject constructor(
                 Pair(it.id, it)
             }
             .onEach { response ->
-                updatePostGlobalOffsetUseCase.invoke(response.first)
+                updatePostGlobalOffsetUseCase.invoke(response.second.clientOffset.toString())
 
                 val sortedMap = (state.value.postGlobalMap + response)
                     .toList()
@@ -91,6 +95,39 @@ class HomeScreenViewModel @Inject constructor(
                     copy(
                         loadingPostGlobal = false,
                         errorLoadPostGlobal = error
+                    )
+                }
+            }
+            .collect()
+    }
+
+    private fun observeRoom() = viewModelScope.launch {
+        observeRoomUseCase.invoke()
+            .onStart {
+                updateState { copy(loadingRoom = true) }
+            }
+            .map {
+                Pair(it.id, it)
+            }
+            .onEach { response ->
+                updateRoomOffsetUseCase.invoke(response.second.clientOffset.toString())
+
+                val sortedMap = (state.value.roomMap + response)
+                    .toList()
+                    .sortedByDescending { it.second.createdAt }
+                    .toMap()
+                updateState {
+                    copy(
+                        roomMap = sortedMap,
+                        loadingRoom = false
+                    )
+                }
+            }
+            .catch { error ->
+                updateState {
+                    copy(
+                        loadingRoom = false,
+                        errorLoadRoom = error
                     )
                 }
             }

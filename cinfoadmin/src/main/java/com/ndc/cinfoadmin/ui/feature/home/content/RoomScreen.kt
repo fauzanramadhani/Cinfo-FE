@@ -122,7 +122,7 @@ fun RoomScreen(
                         title = it.roomName,
                         additional = it.additional
                     ) {
-
+                        // TODO: save room id and navigate to Room Detail Screen
                     }
                 }
         }
