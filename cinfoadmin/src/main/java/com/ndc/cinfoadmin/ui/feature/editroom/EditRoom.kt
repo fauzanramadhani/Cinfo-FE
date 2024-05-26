@@ -1,4 +1,4 @@
-package com.ndc.cinfoadmin.ui.feature.createpost
+package com.ndc.cinfoadmin.ui.feature.editroom
 
 import android.app.Activity
 import androidx.compose.foundation.background
@@ -28,28 +28,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ndc.cinfoadmin.ui.navigation.NavRoute
+import androidx.navigation.compose.rememberNavController
 import com.ndc.core.R
-import com.ndc.core.ui.component.dialog.DialogLoading
-import com.ndc.core.ui.component.textfield.BaseBasicTextField
-import com.ndc.core.utils.Toast
-import com.ndc.core.utils.toDateString
+import com.ndc.core.ui.component.textfield.PrimaryTextField
+import com.ndc.core.ui.theme.CinfoTheme
 
 @Composable
-fun CreatePostScreen(
+fun EditRoom(
     navHostController: NavHostController,
-    createPostViewModel: CreatePostViewModel = hiltViewModel(),
+    viewModel: EditRoomViewModel = hiltViewModel()
 ) {
-    val state by createPostViewModel.state.collectAsStateWithLifecycle(
-        initialValue = CreatePostState()
-    )
-    val effect by createPostViewModel.onEffect.collectAsStateWithLifecycle(
-        initialValue = CreatePostEffect.None
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val effect by viewModel.onEffect.collectAsStateWithLifecycle(
+        initialValue = EditRoomEffect.None
     )
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -59,21 +57,6 @@ fun CreatePostScreen(
     val window = (view.context as Activity).window
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-
-    when (effect) {
-        CreatePostEffect.None -> {}
-        CreatePostEffect.OnCreatePostSuccess -> navHostController.navigate(NavRoute.Home.route) {
-            launchSingleTop = true
-        }
-    }
-
-    DialogLoading(
-        visible = state.createPostLoading
-    )
-
-    state.createPostError?.let {
-        Toast(ctx, it).short()
-    }
 
     Column(
         modifier = Modifier
@@ -103,30 +86,30 @@ fun CreatePostScreen(
             Icon(
                 painter = painterResource(id = R.drawable.ic_done),
                 contentDescription = "",
-                tint = if (state.titleValue.isEmpty() || state.descriptionValue.isEmpty())
+                tint = if (state.roomNameValue.isEmpty() || state.additionalValue.isEmpty())
                     color.surfaceVariant else color.primary,
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable(
-                        enabled = state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty() && !state.createPostLoading,
+                        enabled = state.roomNameValue.isNotEmpty() && state.additionalValue.isNotEmpty() && !state.createRoomLoading,
                         onClick = {
-                            createPostViewModel.onAction(CreatePostAction.CreatePost)
+                            viewModel.onAction(EditRoomAction.EditRoom)
                         }
                     )
             )
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Buat Pengumuman Untuk",
+                text = "Ubah Informasi Jurusan",
                 style = typography.titleLarge,
                 color = color.onBackground
             )
             Text(
-                text = "Universitas Cendekia Abditama",
-                style = typography.labelLarge,
-                color = color.primary
+                text = "Anda dapat mengubah informasi jurusan seperti nama jurusan dan nama angkatan",
+                style = typography.bodyMedium,
+                color = color.secondary
             )
         }
         Divider(
@@ -134,31 +117,63 @@ fun CreatePostScreen(
             color = color.outline
         )
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            BaseBasicTextField(
-                label = "Ketik Judul",
-                value = state.titleValue,
-                onValueChange = {
-                    createPostViewModel.onAction(CreatePostAction.OnTitleValueChange(it))
-                },
-                textStyle = typography.titleLarge,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                )
-            )
             Text(
-                text = System.currentTimeMillis().toDateString(),
-                style = typography.labelMedium,
-                color = color.secondary
+                text = "Nama Jurusan",
+                style = typography.labelLarge,
+                color = color.onBackground
+            )
+            PrimaryTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                placeholder = "Contoh: Teknik Informatika",
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                onClearValue = {
+                    viewModel.onAction(EditRoomAction.OnRoomNameValueChange(""))
+                },
+                value = state.roomNameValue,
+                onValueChange = {
+                    viewModel.onAction(EditRoomAction.OnRoomNameValueChange(it))
+                }
             )
         }
-        BaseBasicTextField(
-            label = "Ketik Pengumuman Disini",
-            value = state.descriptionValue,
-            onValueChange = {
-                createPostViewModel.onAction(CreatePostAction.OnDescriptionValueChange(it))
-            },
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Tahun Angkatan",
+                style = typography.labelLarge,
+                color = color.onBackground
+            )
+            PrimaryTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                placeholder = "Contoh: Angkatan 2020",
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                onClearValue = {
+                    viewModel.onAction(EditRoomAction.OnAdditionalValueChange(""))
+                },
+                value = state.additionalValue,
+                onValueChange = {
+                    viewModel.onAction(EditRoomAction.OnAdditionalValueChange(it))
+                }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun CreateRoomPreview() {
+    CinfoTheme {
+        EditRoom(
+            navHostController = rememberNavController(),
+            viewModel = viewModel()
         )
     }
 }

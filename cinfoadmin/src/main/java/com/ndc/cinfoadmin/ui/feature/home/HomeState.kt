@@ -3,6 +3,7 @@ package com.ndc.cinfoadmin.ui.feature.home
 import com.ndc.core.R
 import com.ndc.core.data.datasource.remote.response.PostGlobalResponse
 import com.ndc.core.data.datasource.remote.response.RoomResponse
+import com.ndc.core.ui.component.bar.BottomNavigationItem
 
 data class HomeState(
     // Root

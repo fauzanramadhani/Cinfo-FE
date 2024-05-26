@@ -46,24 +46,12 @@ class CreatePostViewModel @Inject constructor(
                 sendEffect(CreatePostEffect.OnCreatePostSuccess)
             }
             .catch {
-                updateState {
-                    copy(
-                        createPostError = it.message ?: "empty",
-                    )
-                }
+                updateState { copy(createPostError = it.message,) }
             }
             .onCompletion {
-                updateState {
-                    copy(
-                        createPostLoading = false,
-                    )
-                }
+                updateState { copy(createPostLoading = false,) }
                 delay(300)
-                updateState {
-                    copy(
-                        createPostError = null,
-                    )
-                }
+                updateState { copy(createPostError = null,) }
             }
             .collect()
     }

@@ -9,5 +9,5 @@ class EmitPostGlobalUseCase @Inject constructor(
     operator fun invoke(
         title: String,
         description: String
-        ) = postRepository.emitUpdatePostGlobal(title, description)
+        ) = postRepository.emitPostGlobal(title, description)
 }

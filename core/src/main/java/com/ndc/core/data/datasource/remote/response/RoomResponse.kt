@@ -7,14 +7,14 @@ data class RoomResponse(
 	@field:SerializedName("room_name")
 	val roomName: String,
 
-	@field:SerializedName("createdAt")
+	@field:SerializedName("created_at")
 	val createdAt: Long,
-
-	@field:SerializedName("post_id")
-	val postId: List<String>,
 
 	@field:SerializedName("additional")
 	val additional: String,
+
+	@field:SerializedName("background_id")
+	val backgroundId: Int,
 
 	@field:SerializedName("_id")
 	val id: String,

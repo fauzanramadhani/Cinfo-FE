@@ -1,6 +1,7 @@
-package com.ndc.cinfoadmin.ui.feature.createpost
+package com.ndc.cinfoadmin.ui.feature.createroom
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -28,28 +29,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
 import com.ndc.core.ui.component.dialog.DialogLoading
-import com.ndc.core.ui.component.textfield.BaseBasicTextField
+import com.ndc.core.ui.component.textfield.PrimaryTextField
+import com.ndc.core.ui.theme.CinfoTheme
 import com.ndc.core.utils.Toast
-import com.ndc.core.utils.toDateString
 
 @Composable
-fun CreatePostScreen(
+fun CreateRoom(
     navHostController: NavHostController,
-    createPostViewModel: CreatePostViewModel = hiltViewModel(),
+    viewModel: CreateRoomViewModel = hiltViewModel()
 ) {
-    val state by createPostViewModel.state.collectAsStateWithLifecycle(
-        initialValue = CreatePostState()
-    )
-    val effect by createPostViewModel.onEffect.collectAsStateWithLifecycle(
-        initialValue = CreatePostEffect.None
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val effect by viewModel.onEffect.collectAsStateWithLifecycle(
+        initialValue = CreateRoomEffect.None
     )
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -61,17 +63,15 @@ fun CreatePostScreen(
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
 
     when (effect) {
-        CreatePostEffect.None -> {}
-        CreatePostEffect.OnCreatePostSuccess -> navHostController.navigate(NavRoute.Home.route) {
-            launchSingleTop = true
-        }
+        CreateRoomEffect.None -> {}
+        CreateRoomEffect.OnCreateRoomSuccess -> navHostController.navigateUp()
     }
 
     DialogLoading(
-        visible = state.createPostLoading
+        visible = state.createRoomLoading
     )
 
-    state.createPostError?.let {
+    state.createRoomError?.let {
         Toast(ctx, it).short()
     }
 
@@ -103,30 +103,30 @@ fun CreatePostScreen(
             Icon(
                 painter = painterResource(id = R.drawable.ic_done),
                 contentDescription = "",
-                tint = if (state.titleValue.isEmpty() || state.descriptionValue.isEmpty())
+                tint = if (state.roomName.isEmpty() || state.additional.isEmpty())
                     color.surfaceVariant else color.primary,
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable(
-                        enabled = state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty() && !state.createPostLoading,
+                        enabled = state.roomName.isNotEmpty() && state.additional.isNotEmpty() && !state.createRoomLoading,
                         onClick = {
-                            createPostViewModel.onAction(CreatePostAction.CreatePost)
+                            viewModel.onAction(CreateRoomAction.CreateRoom)
                         }
                     )
             )
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Buat Pengumuman Untuk",
+                text = "Tambah Jurusan",
                 style = typography.titleLarge,
                 color = color.onBackground
             )
             Text(
-                text = "Universitas Cendekia Abditama",
-                style = typography.labelLarge,
-                color = color.primary
+                text = "Dengan menambahkan angkatan, Anda dapat mengumumkan pengumuman kepada angkatan tertentu saja",
+                style = typography.bodyMedium,
+                color = color.secondary
             )
         }
         Divider(
@@ -134,31 +134,63 @@ fun CreatePostScreen(
             color = color.outline
         )
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            BaseBasicTextField(
-                label = "Ketik Judul",
-                value = state.titleValue,
-                onValueChange = {
-                    createPostViewModel.onAction(CreatePostAction.OnTitleValueChange(it))
-                },
-                textStyle = typography.titleLarge,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                )
-            )
             Text(
-                text = System.currentTimeMillis().toDateString(),
-                style = typography.labelMedium,
-                color = color.secondary
+                text = "Nama Jurusan",
+                style = typography.labelLarge,
+                color = color.onBackground
+            )
+            PrimaryTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                placeholder = "Contoh: Teknik Informatika",
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                onClearValue = {
+                    viewModel.onAction(CreateRoomAction.OnRoomNameValueChange(""))
+                },
+                value = state.roomName,
+                onValueChange = {
+                    viewModel.onAction(CreateRoomAction.OnRoomNameValueChange(it))
+                }
             )
         }
-        BaseBasicTextField(
-            label = "Ketik Pengumuman Disini",
-            value = state.descriptionValue,
-            onValueChange = {
-                createPostViewModel.onAction(CreatePostAction.OnDescriptionValueChange(it))
-            },
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Tahun Angkatan",
+                style = typography.labelLarge,
+                color = color.onBackground
+            )
+            PrimaryTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                placeholder = "Contoh: Angkatan 2020",
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                onClearValue = {
+                    viewModel.onAction(CreateRoomAction.OnAdditionalValueChange(""))
+                },
+                value = state.additional,
+                onValueChange = {
+                    viewModel.onAction(CreateRoomAction.OnAdditionalValueChange(it))
+                }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun CreateRoomPreview() {
+    CinfoTheme {
+        CreateRoom(
+            navHostController = rememberNavController(),
+            viewModel = viewModel()
         )
     }
 }

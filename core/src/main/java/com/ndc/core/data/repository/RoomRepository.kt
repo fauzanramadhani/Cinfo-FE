@@ -1,8 +1,10 @@
 package com.ndc.core.data.repository
 
+import com.google.gson.Gson
 import com.ndc.core.data.constant.Event
 import com.ndc.core.data.constant.Options
 import com.ndc.core.data.constant.SharedPref
+import com.ndc.core.data.datasource.remote.body.RoomBody
 import com.ndc.core.data.datasource.remote.response.RoomResponse
 import com.ndc.core.utils.SharedPreferencesManager
 import com.ndc.core.utils.SocketHandler
@@ -17,6 +19,14 @@ class RoomRepository @Inject constructor(
         mSocketHandler.establishConnection()
     }
 
+    fun emitRoom(
+        roomName: String,
+        additional: String,
+    ): Flow<Unit> {
+        val body = Gson().toJson(RoomBody(roomName, additional))
+        return mSocketHandler.emit(Event.CREATE_ROOM, body)
+    }
+
     fun observeRoom(): Flow<RoomResponse> =
         mSocketHandler.observe(Event.ROOM)
 
@@ -24,6 +34,24 @@ class RoomRepository @Inject constructor(
         mSocketHandler.mOptions?.auth?.set(Options.ROOM_OFFSET, offset)
     }
 
-    fun saveRoomIdCache(roomId: String) =
-        sharedPreferencesManager.saveString(SharedPref.ROOM_ID, roomId)
+    fun saveRoomCache(roomResponse: RoomResponse) {
+        sharedPreferencesManager.apply {
+            saveString(SharedPref.ROOM_ID, roomResponse.id)
+            saveString(SharedPref.ROOM_NAME, roomResponse.roomName)
+            saveString(SharedPref.ROOM_ADDITIONAL, roomResponse.additional)
+            saveLong(SharedPref.ROOM_CREATED_AT, roomResponse.createdAt)
+            saveInt(SharedPref.ROOM_BACKGROUND_ID, roomResponse.backgroundId)
+            saveInt(SharedPref.ROOM_CLIENT_OFFSET, roomResponse.clientOffset)
+        }
+    }
+
+    fun getRoomCache() = RoomResponse(
+        id = sharedPreferencesManager.getString(SharedPref.ROOM_ID),
+        roomName = sharedPreferencesManager.getString(SharedPref.ROOM_NAME),
+        createdAt = sharedPreferencesManager.getLong(SharedPref.ROOM_CREATED_AT),
+        additional = sharedPreferencesManager.getString(SharedPref.ROOM_ADDITIONAL),
+        backgroundId = sharedPreferencesManager.getInt(SharedPref.ROOM_BACKGROUND_ID),
+        clientOffset = sharedPreferencesManager.getInt(SharedPref.ROOM_CLIENT_OFFSET)
+    )
+
 }

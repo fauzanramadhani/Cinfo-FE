@@ -1,11 +1,12 @@
 package com.ndc.cinfoadmin.ui.feature.home
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.ndc.core.data.base.BaseViewModel
 import com.ndc.core.data.domain.ObservePostGlobalUseCase
 import com.ndc.core.data.domain.ObserveRoomUseCase
 import com.ndc.core.data.domain.SavePostCacheUseCase
-import com.ndc.core.data.domain.SaveRoomIdCacheUseCase
+import com.ndc.core.data.domain.SaveRoomCacheUseCase
 import com.ndc.core.data.domain.UpdatePostGlobalOffsetUseCase
 import com.ndc.core.data.domain.UpdateRoomOffsetUseCase
 import com.ndc.core.data.domain.UpdateServerAddressUseCase
@@ -26,7 +27,7 @@ class HomeScreenViewModel @Inject constructor(
     private val savePostCacheUseCase: SavePostCacheUseCase,
     private val observeRoomUseCase: ObserveRoomUseCase,
     private val updateRoomOffsetUseCase: UpdateRoomOffsetUseCase,
-    private val saveRoomIdCacheUseCase: SaveRoomIdCacheUseCase
+    private val saveRoomCacheUseCase: SaveRoomCacheUseCase
 ) : BaseViewModel<HomeState, HomeAction, HomeEffect>(
     HomeState()
 ) {
@@ -52,11 +53,13 @@ class HomeScreenViewModel @Inject constructor(
             is HomeAction.OnUpdateServer -> updateServerAddressUseCase.invoke(state.value.updateServerTvValue)
             is HomeAction.OnItemPostGlobalClicked -> savePostCacheUseCase.invoke(action.post)
                 .also {
-                    sendEffect(HomeEffect.OnItemClicked)
+                    sendEffect(HomeEffect.OnItemPostClicked)
                 }
 
             HomeAction.OnObserveRoom -> observeRoom()
-            is HomeAction.OnItemRoomClicked -> saveRoomIdCacheUseCase.invoke(action.room.id)
+            is HomeAction.OnItemRoomClicked -> saveRoomCacheUseCase.invoke(action.room).also {
+                sendEffect(HomeEffect.OnItemRoomClicked)
+            }
         }
     }
 
@@ -82,7 +85,6 @@ class HomeScreenViewModel @Inject constructor(
                         it.second.createdAt
                     }
                     .toMap()
-
                 updateState {
                     copy(
                         postGlobalMap = sortedMap,

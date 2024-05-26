@@ -84,7 +84,7 @@ fun MainScreen(
                     PrimaryButton(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = "Perbarui"
+                        text = "Perbarui Alamat Server"
                     ) {
                         onAction(HomeAction.OnUpdateServerDialogShowChange(show = true))
                     }
@@ -94,7 +94,6 @@ fun MainScreen(
             state.postGlobalMap.isEmpty() ->
                 item {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -104,11 +103,20 @@ fun MainScreen(
                             painter = painterResource(id = R.drawable.empty_illustration),
                             contentDescription = ""
                         )
+                        Spacer(modifier = Modifier.padding(bottom = 16.dp))
                         Text(
                             text = "Ups... Sepertinya belum ada pengumuman",
                             style = typography.bodyMedium,
                             color = color.onBackground
                         )
+                        Spacer(modifier = Modifier.padding(bottom = 24.dp))
+                        PrimaryButton(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = "Perbarui Alamat Server"
+                        ) {
+                            onAction(HomeAction.OnUpdateServerDialogShowChange(show = true))
+                        }
                     }
                 }
 

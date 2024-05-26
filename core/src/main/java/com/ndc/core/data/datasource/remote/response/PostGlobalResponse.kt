@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class PostGlobalResponse(
 
-	@field:SerializedName("createdAt")
+	@field:SerializedName("created_at")
 	val createdAt: Long,
 
 	@field:SerializedName("description")

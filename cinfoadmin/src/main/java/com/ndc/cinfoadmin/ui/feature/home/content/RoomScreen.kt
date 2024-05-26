@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ndc.cinfoadmin.ui.feature.home.HomeAction
 import com.ndc.cinfoadmin.ui.feature.home.HomeState
@@ -25,6 +26,7 @@ import com.ndc.core.R
 import com.ndc.core.ui.component.button.PrimaryButton
 import com.ndc.core.ui.component.item.RoomItem
 import com.ndc.core.utils.MSocketException
+import com.ndc.core.utils.getBackgroundRes
 
 @Composable
 fun RoomScreen(
@@ -53,6 +55,7 @@ fun RoomScreen(
             state.errorLoadRoom != null -> item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
@@ -61,7 +64,6 @@ fun RoomScreen(
                         painter = painterResource(id = R.drawable.server_failure_illustration),
                         contentDescription = ""
                     )
-                    Spacer(modifier = Modifier.padding(bottom = 16.dp))
                     Text(
                         text = when (state.errorLoadRoom) {
                             is MSocketException.EmptyServerAddress -> "Alamat server masih kosong"
@@ -70,7 +72,6 @@ fun RoomScreen(
                         style = typography.bodyMedium,
                         color = color.onBackground
                     )
-
                     Text(
                         text = when (state.errorLoadRoom) {
                             is MSocketException.EmptyServerAddress -> "Silahkan perbarui alamat server"
@@ -79,14 +80,6 @@ fun RoomScreen(
                         style = typography.bodyMedium,
                         color = color.onBackground
                     )
-                    Spacer(modifier = Modifier.padding(bottom = 24.dp))
-                    PrimaryButton(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        text = "Perbarui"
-                    ) {
-                        onAction(HomeAction.OnUpdateServerDialogShowChange(show = true))
-                    }
                 }
             }
 
@@ -106,7 +99,8 @@ fun RoomScreen(
                         Text(
                             text = "Ups... Sepertinya belum ada ruang angkatan tersedia",
                             style = typography.bodyMedium,
-                            color = color.onBackground
+                            color = color.onBackground,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -120,9 +114,10 @@ fun RoomScreen(
                 ) {
                     RoomItem(
                         title = it.roomName,
-                        additional = it.additional
+                        additional = it.additional,
+                        backgroundImage = it.backgroundId.getBackgroundRes()
                     ) {
-                        // TODO: save room id and navigate to Room Detail Screen
+                        onAction(HomeAction.OnItemRoomClicked(it))
                     }
                 }
         }

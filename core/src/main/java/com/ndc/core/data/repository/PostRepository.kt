@@ -52,7 +52,7 @@ class PostRepository @Inject constructor(
         )
     }
 
-    fun emitUpdatePostGlobal(
+    fun emitPostGlobal(
         title: String,
         description: String
     ): Flow<Unit> {

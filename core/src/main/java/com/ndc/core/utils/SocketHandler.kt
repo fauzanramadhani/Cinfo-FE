@@ -13,6 +13,7 @@ import io.socket.emitter.Emitter
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SocketHandler @Inject constructor(
@@ -48,20 +49,13 @@ class SocketHandler @Inject constructor(
         }
     }
 
-    inline fun <reified T> observe(
+     inline fun <reified T> observe(
         event: String
     ): Flow<T> = callbackFlow {
         val listener = Emitter.Listener { response ->
-            try {
-                if (response.isNotEmpty()) {
-                    val typeToken = object : TypeToken<T>() {}.type
-                    val result: T = Gson().fromJson(response[0].toString(), typeToken)
-                    trySend(result)
-                }
-            } catch (e: Exception) {
-                close(e)
-                Log.e("error observing", e.message.toString())
-            }
+            val typeToken = object : TypeToken<T>() {}.type
+            val result: T = Gson().fromJson(response[0].toString(), typeToken)
+            trySend(result)
         }
 
         when (mSocket) {
@@ -72,6 +66,10 @@ class SocketHandler @Inject constructor(
         awaitClose {
             mSocket?.off(event, listener)
         }
+    }
+
+    fun p(): Flow<Unit> = flow {
+        emit(Unit)
     }
 
     fun emit(event: String, body: String): Flow<Unit> = callbackFlow {

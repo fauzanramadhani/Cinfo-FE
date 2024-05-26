@@ -21,12 +21,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,6 +50,7 @@ import com.ndc.cinfoadmin.ui.feature.home.content.MainScreen
 import com.ndc.cinfoadmin.ui.feature.home.content.RoomScreen
 import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
+import com.ndc.core.ui.component.bar.BottomNavigationBar
 import com.ndc.core.ui.component.dialog.DialogChangeServerAddress
 import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
 import com.ndc.core.utils.rememberRestartActivity
@@ -92,8 +90,14 @@ fun HomeScreen(
 
     when (effect) {
         HomeEffect.None -> {}
-        HomeEffect.OnItemClicked -> navHostController.navigate(
+        HomeEffect.OnItemPostClicked -> navHostController.navigate(
             NavRoute.Post.route
+        ) {
+            launchSingleTop = true
+        }
+
+        HomeEffect.OnItemRoomClicked -> navHostController.navigate(
+            NavRoute.EachRoom.route
         ) {
             launchSingleTop = true
         }
@@ -240,7 +244,9 @@ fun HomeScreen(
                     containerColor = color.primaryContainer,
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        // TODO
+                        navHostController.navigate(NavRoute.CreateRoom.route) {
+                            launchSingleTop = true
+                        }
                     }
                 ) {
                     Icon(
@@ -267,7 +273,9 @@ fun HomeScreen(
         when (selectedIndex) {
             1 -> RoomScreen(
                 paddingValues = paddingValues,
-                lazyListState = roomListState
+                lazyListState = roomListState,
+                state = state,
+                onAction = homeScreenViewModel::onAction
             )
 
             else -> MainScreen(
@@ -276,54 +284,6 @@ fun HomeScreen(
                 state = state,
                 onAction = homeScreenViewModel::onAction
             )
-        }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(
-    bottomNavigationItems: List<BottomNavigationItem>,
-    selectedIndex: Int,
-    onSelectedIndexChange: (index: Int) -> Unit
-) {
-    val color = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-
-    BottomAppBar(
-        containerColor = Color.Transparent,
-    ) {
-        bottomNavigationItems.forEachIndexed { index, bottomNavigationItem ->
-            with(bottomNavigationItem) {
-                val isSelected = selectedIndex == index
-                NavigationBarItem(
-                    selected = isSelected,
-                    onClick = {
-                        onSelectedIndexChange(index)
-                    },
-                    label = {
-                        Text(
-                            text = label,
-                            style = typography.labelSmall
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            painterResource(
-                                id = if (isSelected) selectedIcon
-                                else unselectedIcon
-                            ),
-                            contentDescription = ""
-                        )
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = color.primary,
-                        unselectedIconColor = color.secondary,
-                        selectedTextColor = color.primary,
-                        unselectedTextColor = color.secondary,
-                        indicatorColor = color.primaryContainer
-                    )
-                )
-            }
         }
     }
 }

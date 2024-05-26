@@ -1,5 +1,6 @@
 package com.ndc.core.utils
 
+import com.ndc.core.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -20,4 +21,10 @@ fun String.limitLength(maxLength: Int): String {
     } else {
         this
     }
+}
+
+fun Int.getBackgroundRes() = when (this) {
+    1 -> R.drawable.background_1
+    2 -> R.drawable.background_2
+    else -> R.drawable.background_3
 }
