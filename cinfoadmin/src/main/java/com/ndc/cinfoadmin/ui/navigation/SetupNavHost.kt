@@ -10,7 +10,6 @@ import com.ndc.cinfoadmin.ui.feature.eachroom.EachRoomScreen
 import com.ndc.cinfoadmin.ui.feature.editroom.EditRoom
 import com.ndc.cinfoadmin.ui.feature.home.HomeScreen
 import com.ndc.cinfoadmin.ui.feature.post.PostScreen
-import com.ndc.cinfoadmin.ui.feature.post.screen.EditPostScreen
 
 @Composable
 fun SetupNavHost(
@@ -50,7 +49,7 @@ fun SetupNavHost(
         ) {
             EditRoom(navHostController = navHostController)
         }
-        
+
         composable(
             route = NavRoute.EachRoom.route
         ) {

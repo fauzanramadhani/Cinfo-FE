@@ -1,7 +1,6 @@
 package com.ndc.cinfoadmin.ui.feature.createroom
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -37,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
 import com.ndc.core.ui.component.dialog.DialogLoading
 import com.ndc.core.ui.component.textfield.PrimaryTextField

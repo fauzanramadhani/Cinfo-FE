@@ -1,6 +1,5 @@
 package com.ndc.cinfoadmin.ui.feature.home
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.ndc.core.data.base.BaseViewModel
 import com.ndc.core.data.domain.ObservePostGlobalUseCase
