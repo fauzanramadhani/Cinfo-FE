@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.ndc.core.data.constant.Event
 import com.ndc.core.data.constant.Options
 import com.ndc.core.data.constant.SharedPref
+import com.ndc.core.data.datasource.remote.body.EditRoomBody
 import com.ndc.core.data.datasource.remote.body.RoomBody
 import com.ndc.core.data.datasource.remote.response.RoomResponse
 import com.ndc.core.utils.SharedPreferencesManager
@@ -33,6 +34,25 @@ class RoomRepository @Inject constructor(
     fun updateRoomOffset(offset: String) {
         mSocketHandler.mOptions?.auth?.set(Options.ROOM_OFFSET, offset)
     }
+
+    fun emitEditRoom(
+        roomId: String,
+        roomName: String,
+        additional: String
+    ): Flow<Unit> {
+        val body = Gson().toJson(EditRoomBody(roomId, roomName, additional))
+        return mSocketHandler.emit(Event.EDIT_ROOM, body)
+    }
+
+    fun emitDeleteRoom(
+        roomId: String
+    ): Flow<Unit> {
+        val body = Gson().toJson(mapOf("room_id" to roomId))
+        return mSocketHandler.emit(Event.DELETE_ROOM, body)
+    }
+
+    fun observeDeleteRoom() =
+        mSocketHandler.observe<String>(Event.ON_DELETE_ROOM)
 
     fun saveRoomCache(roomResponse: RoomResponse) {
         sharedPreferencesManager.apply {

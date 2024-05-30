@@ -7,7 +7,12 @@ object SharedPref {
     const val POST_TITLE = "post_title"
     const val POST_DESCRIPTION = "post_description"
     const val POST_CREATED_AT = "post_created_at"
+    const val POST_ROOM_ID = "post_room_id" // only for private post
     const val POST_CLIENT_OFFSET = "post_client_offset"
+    // Post Type
+    const val POST_TYPE = "post_type"
+    const val POST_TYPE_GLOBAL = "post_type_global"
+    const val POST_TYPE_PRIVATE = "post_type_private"
     // Room
     const val ROOM_ID = "room_id"
     const val ROOM_NAME = "room_name"

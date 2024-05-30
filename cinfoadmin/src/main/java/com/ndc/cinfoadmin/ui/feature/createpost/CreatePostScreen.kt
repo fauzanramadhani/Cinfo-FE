@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +34,6 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.ndc.cinfoadmin.ui.navigation.NavRoute
 import com.ndc.core.R
 import com.ndc.core.ui.component.dialog.DialogLoading
 import com.ndc.core.ui.component.textfield.BaseBasicTextField
@@ -60,10 +60,10 @@ fun CreatePostScreen(
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
 
-    when (effect) {
-        CreatePostEffect.None -> {}
-        CreatePostEffect.OnCreatePostSuccess -> navHostController.navigate(NavRoute.Home.route) {
-            launchSingleTop = true
+    LaunchedEffect(effect) {
+        when (effect) {
+            CreatePostEffect.None -> {}
+            CreatePostEffect.OnCreatePostSuccess -> navHostController.navigateUp()
         }
     }
 
@@ -124,7 +124,9 @@ fun CreatePostScreen(
                 color = color.onBackground
             )
             Text(
-                text = "Universitas Cendekia Abditama",
+                text =
+                if (state.room == null) "Universitas Cendekia Abditama"
+                else "${state.room?.roomName} · ${state.room?.additional}",
                 style = typography.labelLarge,
                 color = color.primary
             )

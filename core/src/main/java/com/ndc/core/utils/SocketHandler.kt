@@ -13,11 +13,10 @@ import io.socket.emitter.Emitter
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SocketHandler @Inject constructor(
-    private val sharedPreferencesManager: SharedPreferencesManager,
+    sharedPreferencesManager: SharedPreferencesManager,
 ) {
 
     var mSocket: Socket? = null
@@ -49,7 +48,7 @@ class SocketHandler @Inject constructor(
         }
     }
 
-     inline fun <reified T> observe(
+    inline fun <reified T> observe(
         event: String
     ): Flow<T> = callbackFlow {
         val listener = Emitter.Listener { response ->
@@ -68,21 +67,20 @@ class SocketHandler @Inject constructor(
         }
     }
 
-    fun p(): Flow<Unit> = flow {
-        emit(Unit)
-    }
-
-    fun emit(event: String, body: String): Flow<Unit> = callbackFlow {
+    fun emit(
+        event: String,
+        body: String,
+    ): Flow<Unit> = callbackFlow {
         when (mSocket) {
             null -> close(MSocketException.EmptyServerAddress)
             else -> {
                 mSocket?.emit(event, body, Ack { responseJson ->
                     val result =
                         Gson().fromJson(responseJson[0].toString(), AckResponse::class.java)
+                    Log.e("result", result.toString())
                     if (result.status == "error" && result.message != null) {
                         close(MSocketException.ServerError(result.message))
                     } else trySend(Unit)
-
                 })
             }
         }
@@ -100,33 +98,12 @@ class SocketHandler @Inject constructor(
     @Synchronized
     fun closeConnection() {
         mSocket?.disconnect()
+        mSocket?.close()
     }
 
 }
 
 sealed class MSocketException(message: String) : Exception(message, Throwable(message)) {
-
     data object EmptyServerAddress : MSocketException("empty_server_address")
     class ServerError(messageError: String) : MSocketException(message = messageError)
 }
-
-fun main() {
-    val test = Test(
-        angkatan = "Angkatan 2023",
-        anggota = listOf(
-            "Fauzan",
-            "Gracia",
-            "Ramadhani"
-        ),
-        deskripsi = "Wakwaw"
-    )
-
-    val testJson = Gson().toJson(test) // Ubah menjadi format json
-    println(testJson)
-}
-
-data class Test(
-    val angkatan: String,
-    val anggota: List<String>,
-    val deskripsi: String
-)

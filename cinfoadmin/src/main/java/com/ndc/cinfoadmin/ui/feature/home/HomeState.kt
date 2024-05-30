@@ -21,13 +21,12 @@ data class HomeState(
     ),
     val updateServerDialogShow: Boolean = false,
     val updateServerTvValue: String = "",
+    val loading: Boolean = false,
+    val error: Throwable? = null,
+
     // Main Screen
-    val loadingPostGlobal: Boolean = false,
-    val postGlobalMap: Map<String, PostGlobalResponse> = mapOf(),
-    val errorLoadPostGlobal: Throwable? = null,
+    val postGlobalResponseMap: Map<String, PostGlobalResponse>? = null,
 
     // Room Screen
-    val loadingRoom: Boolean = false,
-    val roomMap: Map<String, RoomResponse> = mapOf(),
-    val errorLoadRoom: Throwable? = null,
+    val roomMap: Map<String, RoomResponse>? = null,
 )

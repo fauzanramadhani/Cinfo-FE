@@ -1,16 +1,33 @@
 package com.ndc.cinfoadmin.ui.feature.eachroom.content
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.ndc.cinfoadmin.ui.feature.eachroom.EachRoomAction
 import com.ndc.cinfoadmin.ui.feature.eachroom.EachRoomState
+import com.ndc.core.R
+import com.ndc.core.ui.component.item.MemberItem
+import com.ndc.core.ui.component.shimmer.shimmerBrush
 
 @Composable
 fun EachRoomMemberScreen(
@@ -18,13 +35,70 @@ fun EachRoomMemberScreen(
     lazyListState: LazyListState,
     state: EachRoomState = EachRoomState(),
     onAction: (EachRoomAction) -> Unit = {},
+    onShowMemberSheet: () -> Unit = {}
 ) {
-    Box(
+    val color = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val ctx = LocalContext.current
+
+    LazyColumn(
         modifier = Modifier
-            .padding(paddingValues)
             .fillMaxSize(),
-        contentAlignment = Alignment.Center
+        state = lazyListState,
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            bottom = paddingValues.calculateBottomPadding() + 16.dp,
+            top = paddingValues.calculateTopPadding() + 16.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(text = "Member Screen")
+        when {
+            state.loadingObserve && state.members == null -> items(3) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(shimmerBrush())
+                )
+            }
+
+            state.members != null && state.members.isEmpty() ->
+                item {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.empty_illustration),
+                            contentDescription = ""
+                        )
+                        Text(
+                            text = "Ups... Sepertinya belum ada anggota",
+                            style = typography.bodyMedium,
+                            color = color.onBackground
+                        )
+                    }
+                }
+
+            else -> state.members?.let { members ->
+                items(
+                    items = members.values.toList(),
+                    key = { it.id }
+                ) { member ->
+                    MemberItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        memberEmail = member.email
+                    ) {
+                        onAction(EachRoomAction.OnMemberClicked(member))
+                        onShowMemberSheet()
+                    }
+                }
+            }
+        }
     }
 }

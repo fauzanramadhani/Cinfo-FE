@@ -17,5 +17,5 @@ data class PostGlobalResponse(
 	val title: String,
 
 	@field:SerializedName("client_offset")
-	val clientOffset: Int
+	val clientOffset: Int,
 )

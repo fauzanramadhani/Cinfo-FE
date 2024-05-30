@@ -1,21 +1,26 @@
 package com.ndc.cinfoadmin.ui.feature.home.content
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -24,6 +29,7 @@ import com.ndc.cinfoadmin.ui.feature.home.HomeState
 import com.ndc.core.R
 import com.ndc.core.ui.component.button.PrimaryButton
 import com.ndc.core.ui.component.item.AnnouncementItem
+import com.ndc.core.ui.component.shimmer.shimmerBrush
 import com.ndc.core.utils.MSocketException
 import com.ndc.core.utils.toDateString
 
@@ -51,7 +57,7 @@ fun MainScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when {
-            state.errorLoadPostGlobal != null -> item {
+            state.error != null -> item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -64,65 +70,55 @@ fun MainScreen(
                     )
                     Spacer(modifier = Modifier.padding(bottom = 16.dp))
                     Text(
-                        text = when (state.errorLoadPostGlobal) {
+                        text = when (state.error) {
                             is MSocketException.EmptyServerAddress -> "Alamat server masih kosong"
-                            else -> state.errorLoadPostGlobal.message.toString()
+                            else -> state.error.message.toString()
                         },
                         style = typography.bodyMedium,
                         color = color.onBackground
                     )
-
                     Text(
-                        text = when (state.errorLoadPostGlobal) {
-                            is MSocketException.EmptyServerAddress -> "Silahkan perbarui alamat server"
-                            else -> state.errorLoadPostGlobal.message.toString()
-                        },
+                        text = "Silahkan perbarui alamat server",
                         style = typography.bodyMedium,
                         color = color.onBackground
                     )
-                    Spacer(modifier = Modifier.padding(bottom = 24.dp))
-                    PrimaryButton(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        text = "Perbarui Alamat Server"
-                    ) {
-                        onAction(HomeAction.OnUpdateServerDialogShowChange(show = true))
-                    }
                 }
             }
 
-            state.postGlobalMap.isEmpty() ->
+            state.loading && state.postGlobalResponseMap == null -> items(3) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .fillMaxWidth()
+                        .height(92.dp)
+                        .background(shimmerBrush())
+                )
+            }
+
+            state.postGlobalResponseMap != null && state.postGlobalResponseMap.isEmpty() ->
                 item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
+                            .padding(horizontal = 12.dp),
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.empty_illustration),
                             contentDescription = ""
                         )
-                        Spacer(modifier = Modifier.padding(bottom = 16.dp))
                         Text(
                             text = "Ups... Sepertinya belum ada pengumuman",
                             style = typography.bodyMedium,
                             color = color.onBackground
                         )
-                        Spacer(modifier = Modifier.padding(bottom = 24.dp))
-                        PrimaryButton(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            text = "Perbarui Alamat Server"
-                        ) {
-                            onAction(HomeAction.OnUpdateServerDialogShowChange(show = true))
-                        }
                     }
                 }
 
-            else ->
+            else -> state.postGlobalResponseMap?.let {
                 items(
-                    items = state.postGlobalMap.values.toList(),
+                    items = state.postGlobalResponseMap.values.toList(),
                     key = { event ->
                         event.id
                     }
@@ -131,11 +127,23 @@ fun MainScreen(
                         title = it.title,
                         createdAt = it.createdAt.toDateString("dd MMMM yyyy")
                     ) {
-                        onAction(
-                            HomeAction.OnItemPostGlobalClicked(it)
-                        )
+                        onAction(HomeAction.OnSavePostTypeGlobal)
+                        onAction(HomeAction.OnItemPostGlobalClicked(it))
                     }
                 }
+            }
+        }
+
+        if (state.postGlobalResponseMap.isNullOrEmpty()) {
+            item {
+                PrimaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = "Perbarui Alamat Server"
+                ) {
+                    onAction(HomeAction.OnUpdateServerDialogShowChange(show = true))
+                }
+            }
         }
     }
 }

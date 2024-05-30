@@ -4,9 +4,10 @@ sealed interface PostAction {
     data class OnChangeScreen(
         val screen: Int
     ) : PostAction
-
     data object OnBackPressed : PostAction
 
+    // Detail Post
+    data object OnDeletePost: PostAction
     // Edit Post Screen
     data object OnEditPost: PostAction
     data class OnTitleValueChange(

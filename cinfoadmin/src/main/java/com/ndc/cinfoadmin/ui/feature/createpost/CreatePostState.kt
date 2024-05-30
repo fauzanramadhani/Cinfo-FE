@@ -1,7 +1,9 @@
 package com.ndc.cinfoadmin.ui.feature.createpost
 
+import com.ndc.core.data.datasource.remote.response.RoomResponse
+
 data class CreatePostState(
-    val targetRoom: String = "Universitas Cendekia Abditama",
+    val room: RoomResponse? = null,
     val titleValue: String = "",
     val descriptionValue: String = "",
     val createPostLoading: Boolean = false,

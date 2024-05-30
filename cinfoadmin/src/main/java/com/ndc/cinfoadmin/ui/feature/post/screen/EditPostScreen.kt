@@ -94,11 +94,17 @@ fun EditPostScreen(
                 style = typography.titleLarge,
                 color = color.onBackground
             )
+
             Text(
-                text = "Universitas Cendekia Abditama",
+                text = if (state.room != null) {
+                    "${state.room.roomName} · ${state.room.additional}"
+                } else {
+                    "Universitas Cendekia Abditama"
+                },
                 style = typography.labelLarge,
                 color = color.primary
             )
+
         }
         Divider(
             thickness = 1.dp,

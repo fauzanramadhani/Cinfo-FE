@@ -227,6 +227,7 @@ fun HomeScreen(
                     containerColor = color.primaryContainer,
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
+                        homeScreenViewModel.onAction(HomeAction.OnSavePostTypeGlobal)
                         navHostController.navigate(NavRoute.CreatePost.route) {
                             launchSingleTop = true
                         }
@@ -244,6 +245,7 @@ fun HomeScreen(
                     containerColor = color.primaryContainer,
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
+                        homeScreenViewModel.onAction(HomeAction.OnSavePostTypePrivate)
                         navHostController.navigate(NavRoute.CreateRoom.route) {
                             launchSingleTop = true
                         }

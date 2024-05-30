@@ -80,7 +80,7 @@ fun DetailPostScreen(
                         text = "Hapus",
                         color = color.error
                     ) {
-                        // TODO
+                        onAction(PostAction.OnDeletePost)
                     }
                 }
             }

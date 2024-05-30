@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.ndc.cinfoadmin.ui.feature.createpost.CreatePostScreen
 import com.ndc.cinfoadmin.ui.feature.createroom.CreateRoom
 import com.ndc.cinfoadmin.ui.feature.eachroom.EachRoomScreen
-import com.ndc.cinfoadmin.ui.feature.editroom.EditRoom
+import com.ndc.cinfoadmin.ui.feature.editroom.EditRoomScreen
 import com.ndc.cinfoadmin.ui.feature.home.HomeScreen
 import com.ndc.cinfoadmin.ui.feature.post.PostScreen
 
@@ -47,7 +47,7 @@ fun SetupNavHost(
         composable(
             route = NavRoute.EditRoom.route
         ) {
-            EditRoom(navHostController = navHostController)
+            EditRoomScreen(navHostController = navHostController)
         }
 
         composable(

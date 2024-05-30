@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +42,7 @@ import com.ndc.core.ui.component.textfield.PrimaryTextField
 import com.ndc.core.ui.theme.CinfoTheme
 
 @Composable
-fun EditRoom(
+fun EditRoomScreen(
     navHostController: NavHostController,
     viewModel: EditRoomViewModel = hiltViewModel()
 ) {
@@ -57,6 +58,13 @@ fun EditRoom(
     val window = (view.context as Activity).window
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+
+    LaunchedEffect(effect) {
+        when (effect) {
+            EditRoomEffect.None -> {}
+            EditRoomEffect.OnEditRoomSuccess -> navHostController.navigateUp()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -83,15 +91,18 @@ fun EditRoom(
                         navHostController.navigateUp()
                     }
             )
+            val isSame =
+                state.roomNameValue == state.currentRoomName && state.additionalValue == state.currentAdditional
+            val enabled = state.roomNameValue.isNotEmpty() && state.additionalValue.isNotEmpty() && !state.loading && !isSame
             Icon(
                 painter = painterResource(id = R.drawable.ic_done),
                 contentDescription = "",
-                tint = if (state.roomNameValue.isEmpty() || state.additionalValue.isEmpty())
-                    color.surfaceVariant else color.primary,
+                tint = if (enabled)
+                    color.primary else color.surfaceVariant,
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable(
-                        enabled = state.roomNameValue.isNotEmpty() && state.additionalValue.isNotEmpty() && !state.createRoomLoading,
+                        enabled = enabled,
                         onClick = {
                             viewModel.onAction(EditRoomAction.EditRoom)
                         }
@@ -171,7 +182,7 @@ fun EditRoom(
 @Composable
 fun CreateRoomPreview() {
     CinfoTheme {
-        EditRoom(
+        EditRoomScreen(
             navHostController = rememberNavController(),
             viewModel = viewModel()
         )
