@@ -1,6 +1,7 @@
 package com.ndc.cinfo.ui.screen.login
 
 import android.app.Activity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,18 +44,20 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
-import com.ndc.core.utils.Toast
-import com.ndc.core.utils.UiState
-import com.ndc.core.utils.isEmailInvalid
+import com.ndc.core.R
 import com.ndc.core.ui.component.button.OutlinedButton
 import com.ndc.core.ui.component.button.OutlinedIconButton
 import com.ndc.core.ui.component.button.PrimaryButton
+import com.ndc.core.ui.component.dialog.DialogChangeServerAddress
 import com.ndc.core.ui.component.dialog.DialogLoading
 import com.ndc.core.ui.component.textfield.PasswordTextField
 import com.ndc.core.ui.component.textfield.PrimaryTextField
 import com.ndc.core.ui.component.textfield.TextFieldState
+import com.ndc.core.utils.Toast
+import com.ndc.core.utils.UiState
+import com.ndc.core.utils.isEmailInvalid
+import com.ndc.core.utils.rememberRestartActivity
 
 @Composable
 fun LoginScreen(
@@ -100,6 +103,13 @@ fun LoginScreen(
     var loadingState by rememberSaveable {
         mutableStateOf(false)
     }
+    var updateAddressDialogShow by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var updateAddressDialogValue by rememberSaveable {
+        mutableStateOf("")
+    }
+    val restartApp = rememberRestartActivity(activity = (ctx as ComponentActivity))
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
 
@@ -134,6 +144,28 @@ fun LoginScreen(
                 }
             }
         }
+    }
+
+    if (updateAddressDialogShow) {
+        DialogChangeServerAddress(
+            modifier = Modifier.padding(24.dp),
+            addressValue = updateAddressDialogValue,
+            onAddressChange = {
+                updateAddressDialogValue = it
+            },
+            onClearValue = {
+                updateAddressDialogValue = ""
+            },
+            onDismiss = {
+                updateAddressDialogShow = false
+            },
+            onConfirm = {
+                loginViewModel.updateServerAddress(updateAddressDialogValue)
+                    .also {
+                        restartApp()
+                    }
+            }
+        )
     }
 
     Box(
@@ -335,6 +367,14 @@ fun LoginScreen(
                     .fillMaxWidth()
             ) {
                 googleSignInLauncher.launch(loginViewModel.loginWithGoogleIntent())
+            }
+            PrimaryButton(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .fillMaxWidth(),
+                text = "Perbarui Alamat Server"
+            ) {
+                updateAddressDialogShow = true
             }
         }
     }

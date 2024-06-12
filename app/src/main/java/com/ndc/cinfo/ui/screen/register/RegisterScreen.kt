@@ -40,16 +40,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.ndc.core.R
 import com.ndc.cinfo.ui.navigation.NavRoute
-import com.ndc.core.utils.Toast
-import com.ndc.core.utils.UiState
-import com.ndc.core.utils.isEmailInvalid
+import com.ndc.core.R
 import com.ndc.core.ui.component.button.PrimaryButton
 import com.ndc.core.ui.component.dialog.DialogLoading
 import com.ndc.core.ui.component.textfield.PasswordTextField
 import com.ndc.core.ui.component.textfield.PrimaryTextField
 import com.ndc.core.ui.component.textfield.TextFieldState
+import com.ndc.core.utils.Toast
+import com.ndc.core.utils.UiState
+import com.ndc.core.utils.isEmailInvalid
 
 @Composable
 fun RegisterScreen(

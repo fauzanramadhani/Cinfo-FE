@@ -53,7 +53,7 @@ class SocketHandler @Inject constructor(
     ): Flow<T> = callbackFlow {
         val listener = Emitter.Listener { response ->
             val typeToken = object : TypeToken<T>() {}.type
-            val result: T = Gson().fromJson(response[0].toString(), typeToken)
+            val result: T = Gson().fromJson(response[0]?.toString(), typeToken)
             trySend(result)
         }
 
@@ -77,7 +77,6 @@ class SocketHandler @Inject constructor(
                 mSocket?.emit(event, body, Ack { responseJson ->
                     val result =
                         Gson().fromJson(responseJson[0].toString(), AckResponse::class.java)
-                    Log.e("result", result.toString())
                     if (result.status == "error" && result.message != null) {
                         close(MSocketException.ServerError(result.message))
                     } else trySend(Unit)

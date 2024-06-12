@@ -1,6 +1,7 @@
 package com.ndc.cinfo.ui.screen.home
 
 import android.app.Activity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -32,9 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -47,20 +46,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ndc.cinfo.ui.navigation.NavRoute
 import com.ndc.cinfo.ui.screen.home.content.AccountScreen
 import com.ndc.cinfo.ui.screen.home.content.MainScreen
 import com.ndc.cinfo.ui.screen.home.content.RoomScreen
 import com.ndc.core.R
-import com.ndc.core.data.datasource.remote.response.PostGlobalResponse
 import com.ndc.core.ui.component.button.PrimaryButton
+import com.ndc.core.ui.component.dialog.DialogChangeServerAddress
 import com.ndc.core.ui.component.topbar.TopBarPrimaryLayout
+import com.ndc.core.utils.Toast
+import com.ndc.core.utils.rememberRestartActivity
 
 @Composable
 fun HomeScreen(
     navHostController: NavHostController,
-    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
+    viewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
     val ctx = LocalContext.current
     val color = MaterialTheme.colorScheme
@@ -85,9 +87,11 @@ fun HomeScreen(
             selectedIcon = R.drawable.ic_account_fill
         ),
     )
-    var selectedIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val effect by viewModel.onEffect.collectAsStateWithLifecycle(
+        initialValue = HomeEffect.None
+    )
+    val onAction = viewModel::onAction
     var topBarVisibleMain by rememberSaveable {
         mutableStateOf(true)
     }
@@ -102,45 +106,26 @@ fun HomeScreen(
     var roomListLastVisibleIndex by rememberSaveable {
         mutableIntStateOf(0)
     }
-    val announcementMainList = remember {
-        mutableStateListOf<PostGlobalResponse>()
-    }
-    val announcementRoomList = remember {
-        mutableStateListOf<PostGlobalResponse>()
-    }
+    val restartApp = rememberRestartActivity(activity = (ctx as ComponentActivity))
 
     WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
 
-    BackHandler {
-        when {
-            selectedIndex != 0 -> selectedIndex = 0
-            else -> (ctx as Activity).finish()
+    when (effect) {
+        HomeEffect.None -> {}
+        HomeEffect.OnNavigateToDetailPostScreen -> navHostController.navigate(
+            NavRoute.Post.route
+        ) {
+            launchSingleTop = true
         }
+
+        is HomeEffect.OnShowToast -> Toast(ctx, (effect as HomeEffect.OnShowToast).message).short()
     }
 
-    for (i in 1..10) {
-        announcementMainList.add(
-            PostGlobalResponse(
-                id = "EVENT_$i",
-                title =
-                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
-                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
-                description = "",
-                clientOffset = 0,
-                createdAt = 1727966481000
-            )
-        )
-        announcementRoomList.add(
-            PostGlobalResponse(
-                id = "EVENT_$i",
-                title =
-                if (i % 2 == 0) "Pemberitahuan Liburan Idul Adha"
-                else "Pemeberitahuan pelunasan SPP menjelang UTS Pemeberitahuan pelunasan SPP menjelang UTS",
-                description = "",
-                clientOffset = 0,
-                createdAt = 1727966481000
-            )
-        )
+    BackHandler {
+        when {
+            state.content != 0 -> onAction(HomeAction.OnContentChange(0))
+            else -> (ctx as Activity).finish()
+        }
     }
 
     LaunchedEffect(mainListState) {
@@ -167,6 +152,32 @@ fun HomeScreen(
             }
     }
 
+//    LaunchedEffect(state.room) {
+//        state.room?.let {
+//            onAction(HomeAction.OnObservePostPrivate(it.id))
+//        }
+//    }
+
+    if (state.updateServerDialogShow) {
+        DialogChangeServerAddress(
+            modifier = Modifier.padding(24.dp),
+            addressValue = state.updateServerTvValue,
+            onAddressChange = {
+                viewModel.onAction(HomeAction.OnUpdateServerTvChange(it))
+            },
+            onClearValue = {
+                viewModel.onAction(HomeAction.OnUpdateServerTvChange(""))
+            },
+            onDismiss = {
+                viewModel.onAction(HomeAction.OnUpdateServerDialogShowChange(false))
+            },
+            onConfirm = {
+                viewModel.onAction(HomeAction.OnUpdateServer)
+                restartApp()
+            }
+        )
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -176,7 +187,7 @@ fun HomeScreen(
             .safeDrawingPadding(),
         topBar = {
             AnimatedVisibility(
-                visible = when (selectedIndex) {
+                visible = when (state.content) {
                     1 -> topBarVisibleRoom
                     2 -> true
                     else -> topBarVisibleMain
@@ -184,21 +195,23 @@ fun HomeScreen(
                 enter = fadeIn(initialAlpha = 1f),
                 exit = fadeOut(targetAlpha = 0f)
             ) {
-                when (selectedIndex) {
+                when (state.content) {
                     1 -> TopBarPrimaryLayout {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             Text(
-                                text = "Teknik Informatika",
+                                text = state.room?.roomName ?: "Anda tidak berada di dalam ruangan",
                                 style = typography.bodyMedium,
                                 color = color.onPrimary
                             )
-                            Text(
-                                text = "Angkatan 2020",
-                                style = typography.labelLarge,
-                                color = color.onPrimary
-                            )
+                            state.room?.additional?.let {
+                                Text(
+                                    text = it,
+                                    style = typography.labelLarge,
+                                    color = color.onPrimary
+                                )
+                            }
                         }
                     }
 
@@ -213,7 +226,7 @@ fun HomeScreen(
                                 color = color.onPrimary
                             )
                             Text(
-                                text = homeScreenViewModel.firebaseUser()?.email ?: "",
+                                text = state.firebaseUser?.email ?: "",
                                 style = typography.labelLarge,
                                 color = color.onPrimary,
                                 modifier = Modifier
@@ -230,9 +243,10 @@ fun HomeScreen(
                                     .padding(top = 24.dp)
                                     .fillMaxWidth()
                             ) {
-                                homeScreenViewModel.logout()
-                                navHostController.navigate(NavRoute.Login.route) {
-                                    launchSingleTop = true
+                                onAction(HomeAction.OnLogout).also {
+                                    navHostController.navigate(NavRoute.Login.route) {
+                                        launchSingleTop = true
+                                    }
                                 }
                             }
                         }
@@ -278,23 +292,21 @@ fun HomeScreen(
             ) {
                 BottomNavigationBar(
                     bottomNavigationItems = bottomNavigationItems,
-                    selectedIndex = selectedIndex,
+                    selectedIndex = state.content,
                     onSelectedIndexChange = {
-                        selectedIndex = it
+                        onAction(HomeAction.OnContentChange(it))
                     }
                 )
             }
         }
     ) { paddingValues ->
-        when (selectedIndex) {
+        when (state.content) {
             1 -> RoomScreen(
                 navHostController = navHostController,
                 paddingValues = paddingValues,
                 lazyListState = roomListState,
-                announcementList = announcementRoomList,
-                onClearList = {
-                    announcementRoomList.clear()
-                }
+                state = state,
+                onAction = onAction
             )
 
             2 -> AccountScreen(
@@ -306,7 +318,8 @@ fun HomeScreen(
                 navHostController = navHostController,
                 paddingValues = paddingValues,
                 lazyListState = mainListState,
-                announcementList = announcementMainList
+                state = state,
+                onAction = onAction
             )
         }
     }

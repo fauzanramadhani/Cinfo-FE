@@ -292,8 +292,4 @@ class EachRoomViewModel @Inject constructor(
             }
             .collect()
     }
-
-    override fun onCleared() {
-        super.onCleared()
-    }
 }

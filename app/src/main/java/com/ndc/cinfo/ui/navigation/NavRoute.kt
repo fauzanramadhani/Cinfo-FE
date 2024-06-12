@@ -5,5 +5,5 @@ sealed class NavRoute (val route: String) {
     data object Login: NavRoute(route = "LOGIN_SCREEN")
     data object Register: NavRoute(route = "REGISTER_SCREEN")
     data object Home: NavRoute(route = "HOME_SCREEN")
-    data object DetailAnnouncement: NavRoute(route = "DETAIL_ANNOUNCEMENT")
+    data object Post: NavRoute(route = "POST_SCREEN")
 }

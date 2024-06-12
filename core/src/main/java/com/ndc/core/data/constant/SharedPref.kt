@@ -1,7 +1,8 @@
 package com.ndc.core.data.constant
 
 object SharedPref {
-    const val SERVER_ADDRESS = ""
+    const val SERVER_ADDRESS = "SERVER_ADDRESS"
+    const val USER_ID = "USER_ID"
     // Post
     const val POST_ID = "post_id"
     const val POST_TITLE = "post_title"

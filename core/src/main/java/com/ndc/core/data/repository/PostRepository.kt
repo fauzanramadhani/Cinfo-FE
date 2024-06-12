@@ -1,5 +1,6 @@
 package com.ndc.core.data.repository
 
+import android.util.Log
 import com.google.gson.Gson
 import com.ndc.core.data.constant.Event
 import com.ndc.core.data.constant.Options
@@ -106,9 +107,8 @@ class PostRepository @Inject constructor(
     fun observeDeletePostPrivate(roomId: String): Flow<String> =
         mSocketHandler.observe(roomId + Event.ON_DELETE_POST_PRIVATE)
 
-    fun updatePostPrivateOffset(offset: String) {
+    fun updatePostPrivateOffset(offset: String) =
         mSocketHandler.mOptions?.auth?.set(Options.POST_PRIVATE_OFFSET, offset)
-    }
 
     fun emitCreatePostPrivate(
         roomId: String,

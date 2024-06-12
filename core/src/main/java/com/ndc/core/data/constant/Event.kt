@@ -23,5 +23,6 @@ object Event {
     const val MEMBER = "-member"
     const val ADD_MEMBER = "addMember"
     const val DELETE_MEMBER = "deleteMember"
+    const val ON_ROOM_UPDATE = "-on-room-update"
     const val ON_DELETE_MEMBER = "-on-delete-member"
 }

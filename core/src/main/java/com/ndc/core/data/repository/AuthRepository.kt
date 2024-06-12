@@ -11,11 +11,19 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.ndc.core.data.constant.SharedPref
+import com.ndc.core.data.datasource.remote.contract.ApiService
+import com.ndc.core.utils.SharedPreferencesManager
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.net.ConnectException
 import javax.inject.Inject
 
 
 class AuthRepository @Inject constructor(
     private val googleSignInClient: GoogleSignInClient,
+    private val apiService: ApiService,
+    private val sharedPreferencesManager: SharedPreferencesManager
 ) {
     private val auth = Firebase.auth
 
@@ -45,5 +53,15 @@ class AuthRepository @Inject constructor(
     fun logout() {
         auth.signOut()
         googleSignInClient.signOut()
+        sharedPreferencesManager.saveString(SharedPref.USER_ID, "")
+    }
+
+    suspend fun saveAuth(email: String): Flow<Unit> = flow {
+        val response = apiService.registerUser(email)
+        if (response.status == "success" && response.data != null) {
+            emit(Unit)
+            sharedPreferencesManager.saveString(SharedPref.USER_ID, response.data.userId)
+        } else
+            throw ConnectException(response.message)
     }
 }

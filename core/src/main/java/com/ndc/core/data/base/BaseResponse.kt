@@ -10,6 +10,6 @@ data class BaseResponse<out T>(
     @field:SerializedName("status")
     val status: String,
 
-    @field:SerializedName("status")
+    @field:SerializedName("data")
     val data: T? = null
 )

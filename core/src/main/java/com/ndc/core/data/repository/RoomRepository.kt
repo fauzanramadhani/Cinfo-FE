@@ -20,6 +20,9 @@ class RoomRepository @Inject constructor(
         mSocketHandler.establishConnection()
     }
 
+    fun observeUserRoom(): Flow<RoomResponse?> =
+        mSocketHandler.observe(sharedPreferencesManager.getString(SharedPref.USER_ID)+Event.ON_ROOM_UPDATE)
+
     fun emitRoom(
         roomName: String,
         additional: String,
