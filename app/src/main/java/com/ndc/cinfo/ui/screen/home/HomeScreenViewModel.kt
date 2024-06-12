@@ -1,6 +1,5 @@
 package com.ndc.cinfo.ui.screen.home
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.ndc.core.data.base.BaseViewModel

@@ -1,6 +1,5 @@
 package com.ndc.core.data.repository
 
-import android.util.Log
 import com.google.gson.Gson
 import com.ndc.core.data.constant.Event
 import com.ndc.core.data.constant.Options

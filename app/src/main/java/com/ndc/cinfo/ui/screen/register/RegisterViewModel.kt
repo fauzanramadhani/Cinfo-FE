@@ -2,11 +2,8 @@ package com.ndc.cinfo.ui.screen.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.AuthResult
 import com.ndc.core.data.domain.RegisterUseCase
 import com.ndc.core.data.domain.SaveAuthUseCase
-import com.ndc.core.data.domain.UpdateServerAddressUseCase
-import com.ndc.core.utils.SharedPreferencesManager
 import com.ndc.core.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

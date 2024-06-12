@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.firebase.auth.AuthResult
 import com.ndc.core.data.domain.HandleLoginWithGoogleUseCase
 import com.ndc.core.data.domain.LoginBasicUseCase
 import com.ndc.core.data.domain.SaveAuthUseCase
@@ -27,7 +26,7 @@ class LoginViewModel @Inject constructor(
     private val googleSignInClient: GoogleSignInClient,
     private val updateServerAddressUseCase: UpdateServerAddressUseCase,
     private val saveAuthUseCase: SaveAuthUseCase,
-    ) : ViewModel() {
+) : ViewModel() {
 
     private val _loginState = MutableStateFlow<UiState<String>>(UiState.Empty)
     val loginState: StateFlow<UiState<String>>
@@ -39,7 +38,7 @@ class LoginViewModel @Inject constructor(
     ) = viewModelScope.launch {
         _loginState.tryEmit(UiState.Loading)
         loginBasicUseCase.invoke(email, password).addOnSuccessListener { _ ->
-           saveAuth(email)
+            saveAuth(email)
         }.addOnFailureListener {
             _loginState.tryEmit(UiState.Error(it.message.toString()))
         }
