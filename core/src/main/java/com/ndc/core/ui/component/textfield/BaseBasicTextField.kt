@@ -27,8 +27,7 @@ import com.ndc.core.ui.theme.CinfoTheme
 fun BaseBasicTextField(
     modifier: Modifier = Modifier,
     label: String = "",
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
-    textColor: Color = MaterialTheme.colorScheme.onBackground,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     value: String = "",
@@ -45,7 +44,7 @@ fun BaseBasicTextField(
             value = value,
             onValueChange = onValueChange,
             textStyle = textStyle,
-            cursorBrush = SolidColor(textColor),
+            cursorBrush = SolidColor(color.onBackground),
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions
         )

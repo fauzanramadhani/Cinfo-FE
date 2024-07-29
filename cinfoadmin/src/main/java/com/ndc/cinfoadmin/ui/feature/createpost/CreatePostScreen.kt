@@ -144,7 +144,7 @@ fun CreatePostScreen(
                 onValueChange = {
                     createPostViewModel.onAction(CreatePostAction.OnTitleValueChange(it))
                 },
-                textStyle = typography.titleLarge,
+                textStyle = typography.titleLarge.copy(MaterialTheme.colorScheme.onBackground),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
                 )
